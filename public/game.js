@@ -154,11 +154,15 @@
     const isMobile = cssH > cssW || cssH < 800; // Portrait orientation or small height
     const isTablet = cssH >= 800 && cssH < 1200 && cssW < 1200;
     
-    // For mobile, make death zones very close to screen edges with more space
+    // For mobile portrait, we need larger death zones that are visible on screen
+    const isPortrait = cssH > cssW;
     let offScreenBuffer;
-    if (isMobile) {
-      // Small buffer for mobile - death zones should be close to screen edges
-      offScreenBuffer = 10; // 10px buffer for mobile
+    if (isMobile && isPortrait) {
+      // Larger buffer for mobile portrait so death zones are visible
+      offScreenBuffer = 60; // 60px buffer for mobile portrait - makes death zones visible
+    } else if (isMobile) {
+      // Small buffer for mobile landscape
+      offScreenBuffer = 10; // 10px buffer for mobile landscape
     } else if (isTablet) {
       // Small buffer for tablets
       offScreenBuffer = 15; // 15px buffer for tablets
@@ -1142,6 +1146,42 @@
     }
   }
 
+  function drawDeathZoneIndicators() {
+    // Only show death zone indicators in mobile portrait mode
+    const cssW = window.innerWidth;
+    const cssH = window.innerHeight;
+    const isMobile = cssH > cssW || cssH < 800;
+    const isPortrait = cssH > cssW;
+    
+    if (!(isMobile && isPortrait)) {
+      return; // Don't show indicators on desktop or landscape
+    }
+    
+    // Draw warning zones at top and bottom
+    ctx.save();
+    
+    // Top death zone indicator
+    ctx.fillStyle = 'rgba(255, 0, 0, 0.2)'; // Semi-transparent red
+    ctx.fillRect(0, 0, VIRTUAL_WIDTH, TOP_DEAD_ZONE);
+    
+    // Bottom death zone indicator  
+    ctx.fillStyle = 'rgba(255, 0, 0, 0.2)'; // Semi-transparent red
+    ctx.fillRect(0, VIRTUAL_HEIGHT - BOTTOM_DEAD_ZONE, VIRTUAL_WIDTH, BOTTOM_DEAD_ZONE);
+    
+    // Add warning text
+    ctx.fillStyle = 'rgba(255, 0, 0, 0.8)';
+    ctx.font = 'bold 16px Arial';
+    ctx.textAlign = 'center';
+    
+    // Top warning
+    ctx.fillText('⚠️ DANGER ZONE ⚠️', VIRTUAL_WIDTH / 2, TOP_DEAD_ZONE / 2 + 5);
+    
+    // Bottom warning
+    ctx.fillText('⚠️ DANGER ZONE ⚠️', VIRTUAL_WIDTH / 2, VIRTUAL_HEIGHT - BOTTOM_DEAD_ZONE / 2 + 5);
+    
+    ctx.restore();
+  }
+
   function drawDuck() {
     if (!duckLoaded) return;
     
@@ -1224,6 +1264,7 @@
 
     // Enhanced rendering
     drawBackground();
+    drawDeathZoneIndicators();
     drawDuck();
     drawFud();
     drawSnacks();

@@ -84,15 +84,32 @@ export function MultiWalletButton({ className, customDropdownItems }: MultiWalle
         {/* Abstract AGW Wallet Button */}
         <Button
           onClick={() => {
-            // Find the AGW-specific connector
-            const agwConnector = connectors.find(c => 
-              c.name.toLowerCase().includes('agw') || 
-              (c.name.toLowerCase().includes('injected') && c.id === 'injected')
-            );
-            if (agwConnector) {
-              connect({ connector: agwConnector });
+            // Check if AGW is available and try to connect directly
+            if (typeof window !== 'undefined' && (window as any).agw) {
+              // Direct AGW connection
+              (window as any).agw.request({ method: 'eth_requestAccounts' })
+                .then(() => {
+                  // After AGW connects, use the injected connector
+                  const injectedConnector = connectors.find(c => 
+                    c.name.toLowerCase().includes('injected') && 
+                    !c.name.toLowerCase().includes('metamask')
+                  );
+                  if (injectedConnector) {
+                    connect({ connector: injectedConnector });
+                  }
+                })
+                .catch(() => {
+                  // Fallback to injected connector if direct connection fails
+                  const injectedConnector = connectors.find(c => 
+                    c.name.toLowerCase().includes('injected') && 
+                    !c.name.toLowerCase().includes('metamask')
+                  );
+                  if (injectedConnector) {
+                    connect({ connector: injectedConnector });
+                  }
+                });
             } else {
-              // Fallback to any injected connector
+              // Use injected connector for AGW
               const injectedConnector = connectors.find(c => 
                 c.name.toLowerCase().includes('injected') && 
                 !c.name.toLowerCase().includes('metamask')

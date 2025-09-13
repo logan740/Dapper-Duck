@@ -84,12 +84,12 @@ export function MultiWalletButton({ className, customDropdownItems }: MultiWalle
         {/* Abstract AGW Wallet Button */}
         <Button
           onClick={() => {
-            // Check if AGW is available and try to connect directly
+            // Try to connect to AGW directly first
             if (typeof window !== 'undefined' && (window as any).agw) {
               // Direct AGW connection
               (window as any).agw.request({ method: 'eth_requestAccounts' })
                 .then(() => {
-                  // After AGW connects, use the injected connector
+                  // After successful connection, use the injected connector
                   const injectedConnector = connectors.find(c => 
                     c.name.toLowerCase().includes('injected') && 
                     !c.name.toLowerCase().includes('metamask')
@@ -99,7 +99,7 @@ export function MultiWalletButton({ className, customDropdownItems }: MultiWalle
                   }
                 })
                 .catch(() => {
-                  // Fallback to injected connector if direct connection fails
+                  // If direct connection fails, try injected connector
                   const injectedConnector = connectors.find(c => 
                     c.name.toLowerCase().includes('injected') && 
                     !c.name.toLowerCase().includes('metamask')
@@ -128,12 +128,36 @@ export function MultiWalletButton({ className, customDropdownItems }: MultiWalle
         {/* MetaMask Button */}
         <Button
           onClick={() => {
-            // Find MetaMask connector
-            const metaMaskConnector = connectors.find(c => 
-              c.name.toLowerCase().includes('metamask')
-            );
-            if (metaMaskConnector) {
-              connect({ connector: metaMaskConnector });
+            // Try to open MetaMask extension directly
+            if (typeof window !== 'undefined' && (window as any).ethereum?.isMetaMask) {
+              // Direct MetaMask connection
+              (window as any).ethereum.request({ method: 'eth_requestAccounts' })
+                .then(() => {
+                  // After MetaMask connects, use the MetaMask connector
+                  const metaMaskConnector = connectors.find(c => 
+                    c.name.toLowerCase().includes('metamask')
+                  );
+                  if (metaMaskConnector) {
+                    connect({ connector: metaMaskConnector });
+                  }
+                })
+                .catch(() => {
+                  // Fallback to MetaMask connector if direct connection fails
+                  const metaMaskConnector = connectors.find(c => 
+                    c.name.toLowerCase().includes('metamask')
+                  );
+                  if (metaMaskConnector) {
+                    connect({ connector: metaMaskConnector });
+                  }
+                });
+            } else {
+              // Use MetaMask connector
+              const metaMaskConnector = connectors.find(c => 
+                c.name.toLowerCase().includes('metamask')
+              );
+              if (metaMaskConnector) {
+                connect({ connector: metaMaskConnector });
+              }
             }
           }}
           className="cursor-pointer group min-w-32"

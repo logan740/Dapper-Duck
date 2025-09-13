@@ -1697,25 +1697,32 @@ export function HomeScreen() {
       {/* Header */}
       <header className="sticky top-0 z-50 bg-black/20 backdrop-blur-xl border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-3">
+          <div className="flex items-center justify-between h-16 sm:h-16 md:h-20">
+            <div className="flex items-center space-x-2 sm:space-x-3">
               <div className="relative">
-                <img src="/assets/duck.png" alt="Dapper Duck" className="w-10 h-10 drop-shadow-lg" />
-                <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-orange-400 to-red-500 rounded-full animate-pulse"></div>
+                <img 
+                  src="/assets/duck.png" 
+                  alt="Dapper Duck" 
+                  className="w-8 h-8 sm:w-10 sm:h-10 drop-shadow-lg"
+                  style={{ imageRendering: 'auto' }}
+                />
+                <div className="absolute -top-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-gradient-to-r from-orange-400 to-red-500 rounded-full animate-pulse"></div>
               </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-orange-400 via-red-500 to-pink-500 bg-clip-text text-transparent">
+              <span className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-orange-400 via-red-500 to-pink-500 bg-clip-text text-transparent">
                 Dapper Duck
               </span>
             </div>
-            <RainbowWalletButton />
+            <div className="scale-90 sm:scale-100">
+              <RainbowWalletButton />
+            </div>
           </div>
         </div>
       </header>
 
       {/* Navigation Tabs */}
-      <nav className="sticky top-16 z-40 bg-black/10 backdrop-blur-xl border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex space-x-8">
+      <nav className="sticky top-16 sm:top-16 md:top-20 z-40 bg-black/10 backdrop-blur-xl border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
+          <div className="flex space-x-2 sm:space-x-4 md:space-x-8 overflow-x-auto">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               return (
@@ -1723,14 +1730,14 @@ export function HomeScreen() {
                   key={tab.id}
                   onClick={() => handleTabChange(tab.id)}
                   className={cn(
-                    "flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm transition-all duration-300",
+                    "flex items-center space-x-1 sm:space-x-2 py-3 sm:py-4 px-2 sm:px-1 border-b-2 font-medium text-xs sm:text-sm transition-all duration-300 whitespace-nowrap",
                     activeTab === tab.id
                       ? "border-orange-400 text-orange-400 bg-orange-400/10 rounded-t-lg"
                       : "border-transparent text-gray-300 hover:text-white hover:border-gray-400 hover:bg-white/5 rounded-t-lg"
                   )}
                 >
-                  <Icon className="w-5 h-5" />
-                  <span>{tab.label}</span>
+                  <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="hidden xs:inline">{tab.label}</span>
                 </button>
               );
             })}
@@ -1739,7 +1746,7 @@ export function HomeScreen() {
       </nav>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-6 sm:py-8 md:py-12">
         {renderContent()}
       </main>
 

@@ -1156,6 +1156,21 @@
       }
       ctx.restore();
     }
+    
+    // Add black bars at top and bottom to cover cloud bleeding
+    const cssW = window.innerWidth;
+    const cssH = window.innerHeight;
+    const isMobile = cssH > cssW || cssH < 800;
+    const isPortrait = cssH > cssW;
+    
+    if (isMobile && isPortrait) {
+      // Mobile portrait has black bars, cover the cloud bleeding
+      ctx.fillStyle = '#000000';
+      // Cover top area where clouds might bleed
+      ctx.fillRect(0, 0, VIRTUAL_WIDTH, 50);
+      // Cover bottom area where clouds might bleed  
+      ctx.fillRect(0, VIRTUAL_HEIGHT - 50, VIRTUAL_WIDTH, 50);
+    }
   }
 
   function drawDeathZoneIndicators() {

@@ -506,7 +506,8 @@
 
   function spawnFudBag() {
     const img = fudImages[Math.floor(Math.random() * fudImages.length)];
-    const margin = Math.max(TOP_DEAD_ZONE, BOTTOM_DEAD_ZONE) + 30;
+    // Ensure FUD bags stay at least 5px from screen edges on both mobile and PC
+    const margin = Math.max(TOP_DEAD_ZONE, BOTTOM_DEAD_ZONE) + 5;
     const difficulty = getDifficultyLevel();
     
     // More aggressive patterns at higher difficulty
@@ -527,7 +528,8 @@
 
   function spawnZeroScoreFudBag() {
     const img = fudImages[Math.floor(Math.random() * fudImages.length)];
-    const margin = Math.max(TOP_DEAD_ZONE, BOTTOM_DEAD_ZONE) + 30;
+    // Ensure zero-score FUD bags stay at least 5px from screen edges on both mobile and PC
+    const margin = Math.max(TOP_DEAD_ZONE, BOTTOM_DEAD_ZONE) + 5;
     const difficulty = getDifficultyLevel();
     
     // Zero-score FUD bags are less frequent and get more frequent over time
@@ -801,7 +803,8 @@
     const img = snackImages[choice.idx];
     lastSnackPoints = choice.points;
 
-    const margin = Math.max(TOP_DEAD_ZONE, BOTTOM_DEAD_ZONE) + 24;
+    // Ensure snacks stay at least 5px from screen edges on both mobile and PC
+    const margin = Math.max(TOP_DEAD_ZONE, BOTTOM_DEAD_ZONE) + 5;
     const snack = {
       x: VIRTUAL_WIDTH + 40,
       y: Math.random() * (VIRTUAL_HEIGHT - margin*2 - SNACK_SIZE) + margin,
@@ -976,7 +979,8 @@
     const type = types[Math.floor(Math.random() * types.length)];
     const powerup = POWERUP_TYPES[type];
     
-    const margin = Math.max(TOP_DEAD_ZONE, BOTTOM_DEAD_ZONE) + 20;
+    // Ensure power-ups stay at least 5px from screen edges on both mobile and PC
+    const margin = Math.max(TOP_DEAD_ZONE, BOTTOM_DEAD_ZONE) + 5;
     activePowerup = {
       x: VIRTUAL_WIDTH + 40,
       y: Math.random() * (VIRTUAL_HEIGHT - margin*2 - POWERUP_SIZE) + margin,

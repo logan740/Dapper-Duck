@@ -154,45 +154,24 @@
     const isMobile = cssH > cssW || cssH < 800; // Portrait orientation or small height
     const isTablet = cssH >= 800 && cssH < 1200 && cssW < 1200;
     
-    // Different dead zone ratios for different device types
-    let screenDeadZoneRatio;
-    if (isMobile) {
-      screenDeadZoneRatio = 0.5; // 50% of screen height - extremely loose for mobile
-    } else if (isTablet) {
-      screenDeadZoneRatio = 0.12; // 12% of screen height - medium for tablets
-    } else {
-      screenDeadZoneRatio = 0.05; // 5% of screen height - tighter for desktop
-    }
+    // Simple approach: death lines just slightly off screen for all devices
+    // This allows the duck to go to the very edge of the screen and just a little beyond
+    const offScreenBuffer = 50; // 50px buffer off screen for all devices
     
-    const screenDeadZone = cssH * screenDeadZoneRatio;
+    // Convert the off-screen buffer to virtual canvas coordinates
+    const virtualDeadZone = offScreenBuffer / scale;
     
-    // Convert screen dead zone back to virtual canvas coordinates
-    const virtualDeadZone = screenDeadZone / scale;
+    // Set both dead zones to the same simple value
+    TOP_DEAD_ZONE = virtualDeadZone;
+    BOTTOM_DEAD_ZONE = virtualDeadZone;
     
-    // Set minimum and maximum dead zones based on device type
-    let minDeadZone, maxDeadZone;
-    if (isMobile) {
-      minDeadZone = 200; // Minimum 200px on mobile - extremely forgiving
-      maxDeadZone = 350; // Maximum 350px on mobile - duck can go way off screen
-    } else if (isTablet) {
-      minDeadZone = 70;  // Minimum 70px on tablet
-      maxDeadZone = 120; // Maximum 120px on tablet
-    } else {
-      minDeadZone = 40;  // Minimum 40px on desktop
-      maxDeadZone = 80;  // Maximum 80px on desktop
-    }
-    
-    TOP_DEAD_ZONE = Math.max(Math.min(virtualDeadZone, maxDeadZone), minDeadZone);
-    BOTTOM_DEAD_ZONE = Math.max(Math.min(virtualDeadZone, maxDeadZone), minDeadZone);
-    
-    console.log('Responsive dead zones calculated:', {
+    console.log('Simple dead zones calculated:', {
       deviceType: isMobile ? 'mobile' : isTablet ? 'tablet' : 'desktop',
       screenWidth: cssW,
       screenHeight: cssH,
       renderedHeight: renderedHeight,
       scale: scale,
-      screenDeadZoneRatio: screenDeadZoneRatio,
-      screenDeadZone: screenDeadZone,
+      offScreenBuffer: offScreenBuffer,
       virtualDeadZone: virtualDeadZone,
       topDeadZone: TOP_DEAD_ZONE,
       bottomDeadZone: BOTTOM_DEAD_ZONE

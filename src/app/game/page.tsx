@@ -2,7 +2,7 @@
 
 import Script from "next/script";
 import { useEffect } from "react";
-import { MultiWalletButton } from "@/components/multi-wallet-button";
+import { RainbowWalletButton } from "@/components/rainbow-wallet-button";
 import Link from "next/link";
 import { useAccount } from "wagmi";
 
@@ -142,7 +142,7 @@ export default function GamePage() {
 
       {/* Wallet Connection */}
       <div className="absolute top-4 right-4 z-50">
-        <MultiWalletButton />
+        <RainbowWalletButton />
       </div>
 
       {/* Load Game Script */}

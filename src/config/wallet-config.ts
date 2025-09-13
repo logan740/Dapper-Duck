@@ -1,31 +1,19 @@
-import { createConfig, http } from 'wagmi';
+import { getDefaultConfig } from '@rainbow-me/rainbowkit';
 import { abstractTestnet } from 'viem/chains';
-import { injected, metaMask } from '@wagmi/connectors';
 
 /**
- * Wallet configuration supporting both Abstract Global Wallet and MetaMask
+ * Wallet configuration using RainbowKit with Abstract Global Wallet and MetaMask
  * 
- * This configuration allows users to choose between:
- * - Abstract Global Wallet (AGW) - for mainnet and Abstract-specific features
+ * This configuration provides:
+ * - Abstract Global Wallet (AGW) - proper AGW integration via RainbowKit
  * - MetaMask - for testing and broader compatibility
+ * - Clean UI with RainbowKit's wallet selection modal
  */
-export const wagmiConfig = createConfig({
+export const config = getDefaultConfig({
+  appName: 'Dapper Duck',
+  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'your-project-id',
   chains: [abstractTestnet],
-  connectors: [
-    // MetaMask connector for testing and broader compatibility
-    metaMask({
-      dappMetadata: {
-        name: 'Dapper Duck',
-        url: 'https://dapper-duck.vercel.app',
-        iconUrl: 'https://dapper-duck.vercel.app/favicon.ico',
-      },
-    }),
-    // General injected connector for AGW and other wallets
-    injected(),
-  ],
-  transports: {
-    [abstractTestnet.id]: http(),
-  },
+  ssr: false, // If your dApp uses server side rendering (SSR)
 });
 
 // Export chain for use in other components

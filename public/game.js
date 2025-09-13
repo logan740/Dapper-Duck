@@ -175,8 +175,8 @@
     const virtualDeadZone = offScreenBuffer / scale;
     
     // Set both dead zones to the same simple value
-    // For mobile portrait, make death zones smaller than visual danger zones
-    if (isMobile && isPortrait) {
+    // For mobile portrait and desktop, make death zones smaller than visual danger zones
+    if ((isMobile && isPortrait) || (!isMobile && !isTablet)) {
       // Death zones are 20px inside the visual danger zones
       const innerDeadZone = Math.max(20, virtualDeadZone - 20);
       TOP_DEAD_ZONE = innerDeadZone;
@@ -1169,9 +1169,13 @@
     
     console.log('Death zone indicators:', { cssW, cssH, isMobile, isPortrait, isTablet, isDesktop });
     
+    // FORCE desktop indicators to show - remove the condition for now
     if (!(isMobile && isPortrait) && !isDesktop) {
+      console.log('Not showing indicators - device type not supported');
       return; // Don't show indicators on mobile landscape or tablets
     }
+    
+    console.log('Drawing death zone indicators for:', isMobile && isPortrait ? 'mobile-portrait' : 'desktop');
     
     // Calculate the visual danger zone size (larger than actual death zones)
     let offScreenBuffer;
@@ -1200,22 +1204,17 @@
       ctx.fillText('⚠️ DANGER ZONE ⚠️', VIRTUAL_WIDTH / 2, visualDeadZone / 2 + 5);
       ctx.fillText('⚠️ DANGER ZONE ⚠️', VIRTUAL_WIDTH / 2, VIRTUAL_HEIGHT - visualDeadZone / 2 + 5);
     } else if (isDesktop) {
-      // Desktop: Subtle boundary lines
-      ctx.strokeStyle = 'rgba(255, 0, 0, 0.4)'; // Semi-transparent red lines
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(0, visualDeadZone);
-      ctx.lineTo(VIRTUAL_WIDTH, visualDeadZone);
-      ctx.moveTo(0, VIRTUAL_HEIGHT - visualDeadZone);
-      ctx.lineTo(VIRTUAL_WIDTH, VIRTUAL_HEIGHT - visualDeadZone);
-      ctx.stroke();
+      // Desktop: Full danger zones like mobile portrait
+      ctx.fillStyle = 'rgba(255, 0, 0, 0.3)'; // Semi-transparent red
+      ctx.fillRect(0, 0, VIRTUAL_WIDTH, visualDeadZone);
+      ctx.fillRect(0, VIRTUAL_HEIGHT - visualDeadZone, VIRTUAL_WIDTH, visualDeadZone);
       
-      // Add subtle text
-      ctx.fillStyle = 'rgba(255, 0, 0, 0.6)';
-      ctx.font = 'bold 12px Arial';
+      // Add warning text
+      ctx.fillStyle = 'rgba(255, 0, 0, 0.9)';
+      ctx.font = 'bold 18px Arial';
       ctx.textAlign = 'center';
-      ctx.fillText('Boundary', VIRTUAL_WIDTH / 2, visualDeadZone - 5);
-      ctx.fillText('Boundary', VIRTUAL_WIDTH / 2, VIRTUAL_HEIGHT - visualDeadZone + 15);
+      ctx.fillText('⚠️ DANGER ZONE ⚠️', VIRTUAL_WIDTH / 2, visualDeadZone / 2 + 5);
+      ctx.fillText('⚠️ DANGER ZONE ⚠️', VIRTUAL_WIDTH / 2, VIRTUAL_HEIGHT - visualDeadZone / 2 + 5);
     }
     
     ctx.restore();

@@ -157,11 +157,11 @@
     // For mobile, make death zones very close to screen edges with more space
     let offScreenBuffer;
     if (isMobile) {
-      // Very minimal buffer for mobile - death zones should be at screen edges
-      offScreenBuffer = 2; // 2px buffer for mobile - almost at screen edge
+      // Small buffer for mobile - death zones should be close to screen edges
+      offScreenBuffer = 8; // 8px buffer for mobile - close to screen edge
     } else if (isTablet) {
       // Small buffer for tablets
-      offScreenBuffer = 10; // 10px buffer for tablets
+      offScreenBuffer = 15; // 15px buffer for tablets
     } else {
       // Standard buffer for desktop
       offScreenBuffer = 40; // 40px buffer for desktop
@@ -194,9 +194,10 @@
     // Use appropriate scaling for mobile vs desktop
     const isMobile = cssH > cssW || cssH < 800;
     if (isMobile) {
-      // On mobile, use fill scale to ensure the canvas covers the entire screen
-      // This prevents the duck from being cut off
-      scale = Math.max(cssW / VIRTUAL_WIDTH, cssH / VIRTUAL_HEIGHT);
+      // On mobile, use fit scale to prevent left/right cutoff
+      // This ensures the entire game area is visible
+      scale = Math.min(cssW / VIRTUAL_WIDTH, cssH / VIRTUAL_HEIGHT);
+      console.log('Mobile scaling:', { cssW, cssH, scale, offsetX: (cssW - VIRTUAL_WIDTH * scale) * 0.5 });
     } else {
       // On desktop, use fit scale to maintain aspect ratio
       scale = Math.min(cssW / VIRTUAL_WIDTH, cssH / VIRTUAL_HEIGHT);

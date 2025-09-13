@@ -81,16 +81,25 @@ export function MultiWalletButton({ className, customDropdownItems }: MultiWalle
   if (!isConnected) {
     return (
       <div className={cn("flex space-x-2", className)}>
-        {/* Abstract Wallet Button */}
+        {/* Abstract AGW Wallet Button */}
         <Button
           onClick={() => {
+            // Find the AGW-specific connector
             const agwConnector = connectors.find(c => 
               c.name.toLowerCase().includes('agw') || 
-              c.name.toLowerCase().includes('abstract') ||
-              c.name.toLowerCase().includes('injected')
+              (c.name.toLowerCase().includes('injected') && c.id === 'injected')
             );
             if (agwConnector) {
               connect({ connector: agwConnector });
+            } else {
+              // Fallback to any injected connector
+              const injectedConnector = connectors.find(c => 
+                c.name.toLowerCase().includes('injected') && 
+                !c.name.toLowerCase().includes('metamask')
+              );
+              if (injectedConnector) {
+                connect({ connector: injectedConnector });
+              }
             }
           }}
           className="cursor-pointer group min-w-32"
@@ -102,6 +111,7 @@ export function MultiWalletButton({ className, customDropdownItems }: MultiWalle
         {/* MetaMask Button */}
         <Button
           onClick={() => {
+            // Find MetaMask connector
             const metaMaskConnector = connectors.find(c => 
               c.name.toLowerCase().includes('metamask')
             );

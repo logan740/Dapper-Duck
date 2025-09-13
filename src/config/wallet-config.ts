@@ -20,7 +20,11 @@ export const wagmiConfig = createConfig({
         iconUrl: 'https://dapper-duck.vercel.app/favicon.ico',
       },
     }),
-    // Injected connector for other wallets (including AGW)
+    // AGW-specific connector
+    injected({
+      target: 'agw',
+    }),
+    // General injected connector for other wallets
     injected(),
   ],
   transports: {

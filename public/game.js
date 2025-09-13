@@ -157,14 +157,14 @@
     // For mobile, make death zones very close to screen edges with more space
     let offScreenBuffer;
     if (isMobile) {
-      // Very small buffer for mobile - death zones should be at screen edges
-      offScreenBuffer = 5; // 5px buffer for mobile - almost at screen edge
+      // Small buffer for mobile - death zones should be close to screen edges
+      offScreenBuffer = 20; // 20px buffer for mobile
     } else if (isTablet) {
       // Small buffer for tablets
       offScreenBuffer = 15; // 15px buffer for tablets
     } else {
       // Standard buffer for desktop
-      offScreenBuffer = 40; // 40px buffer for desktop
+      offScreenBuffer = 25; // 25px buffer for desktop
     }
     
     // Convert the off-screen buffer to virtual canvas coordinates

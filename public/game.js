@@ -167,8 +167,8 @@
       // Small buffer for tablets
       offScreenBuffer = 15; // 15px buffer for tablets
     } else {
-      // Standard buffer for desktop
-      offScreenBuffer = 25; // 25px buffer for desktop
+      // Larger buffer for desktop to keep items on screen
+      offScreenBuffer = 50; // 50px buffer for desktop - keeps items visible
     }
     
     // Convert the off-screen buffer to virtual canvas coordinates
@@ -1155,41 +1155,61 @@
   }
 
   function drawDeathZoneIndicators() {
-    // Only show death zone indicators in mobile portrait mode
+    // Show death zone indicators on mobile portrait and desktop
     const cssW = window.innerWidth;
     const cssH = window.innerHeight;
     const isMobile = cssH > cssW || cssH < 800;
     const isPortrait = cssH > cssW;
+    const isDesktop = !isMobile && !(cssH >= 800 && cssH < 1200 && cssW < 1200);
     
-    if (!(isMobile && isPortrait)) {
-      return; // Don't show indicators on desktop or landscape
+    if (!(isMobile && isPortrait) && !isDesktop) {
+      return; // Don't show indicators on mobile landscape or tablets
     }
     
     // Calculate the visual danger zone size (larger than actual death zones)
-    const offScreenBuffer = 60; // Same as in calculateResponsiveDeadZones
+    let offScreenBuffer;
+    if (isMobile && isPortrait) {
+      offScreenBuffer = 60; // Mobile portrait
+    } else if (isDesktop) {
+      offScreenBuffer = 50; // Desktop
+    } else {
+      offScreenBuffer = 40; // Mobile landscape
+    }
     const visualDeadZone = offScreenBuffer / scale;
     
     // Draw warning zones at top and bottom
     ctx.save();
     
-    // Top death zone indicator (visual danger zone)
-    ctx.fillStyle = 'rgba(255, 0, 0, 0.2)'; // Semi-transparent red
-    ctx.fillRect(0, 0, VIRTUAL_WIDTH, visualDeadZone);
-    
-    // Bottom death zone indicator (visual danger zone)
-    ctx.fillStyle = 'rgba(255, 0, 0, 0.2)'; // Semi-transparent red
-    ctx.fillRect(0, VIRTUAL_HEIGHT - visualDeadZone, VIRTUAL_WIDTH, visualDeadZone);
-    
-    // Add warning text
-    ctx.fillStyle = 'rgba(255, 0, 0, 0.8)';
-    ctx.font = 'bold 16px Arial';
-    ctx.textAlign = 'center';
-    
-    // Top warning
-    ctx.fillText('⚠️ DANGER ZONE ⚠️', VIRTUAL_WIDTH / 2, visualDeadZone / 2 + 5);
-    
-    // Bottom warning
-    ctx.fillText('⚠️ DANGER ZONE ⚠️', VIRTUAL_WIDTH / 2, VIRTUAL_HEIGHT - visualDeadZone / 2 + 5);
+    if (isMobile && isPortrait) {
+      // Mobile portrait: Full warning with text
+      ctx.fillStyle = 'rgba(255, 0, 0, 0.2)'; // Semi-transparent red
+      ctx.fillRect(0, 0, VIRTUAL_WIDTH, visualDeadZone);
+      ctx.fillRect(0, VIRTUAL_HEIGHT - visualDeadZone, VIRTUAL_WIDTH, visualDeadZone);
+      
+      // Add warning text
+      ctx.fillStyle = 'rgba(255, 0, 0, 0.8)';
+      ctx.font = 'bold 16px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('⚠️ DANGER ZONE ⚠️', VIRTUAL_WIDTH / 2, visualDeadZone / 2 + 5);
+      ctx.fillText('⚠️ DANGER ZONE ⚠️', VIRTUAL_WIDTH / 2, VIRTUAL_HEIGHT - visualDeadZone / 2 + 5);
+    } else if (isDesktop) {
+      // Desktop: Subtle boundary lines
+      ctx.strokeStyle = 'rgba(255, 0, 0, 0.4)'; // Semi-transparent red lines
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, visualDeadZone);
+      ctx.lineTo(VIRTUAL_WIDTH, visualDeadZone);
+      ctx.moveTo(0, VIRTUAL_HEIGHT - visualDeadZone);
+      ctx.lineTo(VIRTUAL_WIDTH, VIRTUAL_HEIGHT - visualDeadZone);
+      ctx.stroke();
+      
+      // Add subtle text
+      ctx.fillStyle = 'rgba(255, 0, 0, 0.6)';
+      ctx.font = 'bold 12px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('Boundary', VIRTUAL_WIDTH / 2, visualDeadZone - 5);
+      ctx.fillText('Boundary', VIRTUAL_WIDTH / 2, VIRTUAL_HEIGHT - visualDeadZone + 15);
+    }
     
     ctx.restore();
   }

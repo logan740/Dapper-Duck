@@ -50,7 +50,7 @@
   // Power-up system
   const POWERUP_SIZE = 40;
   const POWERUP_SPEED = 140;
-  const POWERUP_SPAWN_CHANCE = 0.15; // 15% chance when spawning snack
+  const POWERUP_SPAWN_CHANCE = 0.4; // 40% chance when spawning snack
   const POWERUP_TYPES = {
     SHIELD: { duration: 10, color: '#4F46E5', icon: '🛡️', name: 'Shield' },
     DOUBLE_SCORE: { duration: 10, color: '#F59E0B', icon: '⭐', name: '2x Score' },
@@ -1344,15 +1344,25 @@
   // Leaderboard functions
   function saveToLeaderboard() {
     try {
-      const playerName = window.getProfileData ? window.getProfileData().name : 'Anonymous Player';
-      const isPaid = window.currentGameType === 'paid';
+      console.log('saveToLeaderboard called, window.getProfileData exists:', !!window.getProfileData);
       
-      // Get profile data including picture and socials
-      const profileData = window.getProfileData ? window.getProfileData() : {};
+      let playerName = 'Anonymous Player';
+      let profileData = {};
+      
+      if (window.getProfileData) {
+        profileData = window.getProfileData();
+        console.log('getProfileData returned:', profileData);
+        playerName = profileData.name || 'Anonymous Player';
+        console.log('Using player name:', playerName);
+      } else {
+        console.log('window.getProfileData not available');
+      }
+      
+      const isPaid = window.currentGameType === 'paid';
       
       const leaderboardEntry = {
         id: Date.now().toString(),
-        name: playerName || 'Anonymous Player',
+        name: playerName,
         score: score,
         timestamp: Date.now(),
         isPaid: isPaid,

@@ -82,58 +82,36 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
           console.log('MetaMask installed:', isMetaMaskInstalled);
           console.log('window.ethereum:', (window as any).ethereum);
           
-          // Find MetaMask connector first
-          let metaMaskConnector = connectors.find(c => 
-            c.name.toLowerCase() === 'metamask' || 
-            c.id.toLowerCase() === 'metamask' ||
-            (c.name.toLowerCase().includes('metamask') && !c.name.toLowerCase().includes('magic'))
-          );
-          
-          // If not found, try injected connector
-          if (!metaMaskConnector) {
-            metaMaskConnector = connectors.find(c => 
-              c.id === 'injected' || c.name.toLowerCase().includes('injected')
-            );
-            console.log('Using injected connector as fallback:', metaMaskConnector);
-          }
-          
-          console.log('Found MetaMask connector:', metaMaskConnector);
-          
-          // Use wagmi connection (this will properly open MetaMask and request signatures)
-          if (metaMaskConnector) {
+          // Try ALL available connectors to see which one works
+          for (const connector of connectors) {
+            console.log(`Trying connector: ${connector.name} (${connector.id})`);
             try {
-              console.log('Attempting to connect with wagmi MetaMask connector...');
-              await connect({ connector: metaMaskConnector });
-              console.log('Wagmi MetaMask connection successful');
+              await connect({ connector });
+              console.log(`Successfully connected with ${connector.name}!`);
               return;
             } catch (error) {
-              console.error('Wagmi MetaMask connection failed:', error);
+              console.log(`Failed to connect with ${connector.name}:`, error instanceof Error ? error.message : String(error));
             }
           }
           
-          // Fallback to direct connection only if wagmi fails
+          // If no connector worked, try direct connection
           if (isMetaMaskInstalled) {
             try {
-              console.log('Attempting direct MetaMask connection as fallback...');
+              console.log('All connectors failed, trying direct MetaMask connection...');
               const accounts = await (window as any).ethereum.request({ 
                 method: 'eth_requestAccounts' 
               });
               console.log('Direct MetaMask connection successful:', accounts);
-              // Note: This won't update the UI state properly
-              alert('MetaMask connected but UI may not update. Please refresh the page.');
+              alert('MetaMask connected directly but UI may not update. Please refresh the page.');
               return;
             } catch (error) {
               console.error('Direct MetaMask connection failed:', error);
             }
           }
           
-          // If we get here, no connection method worked
-          console.error('No MetaMask connector found');
-          if (isMetaMaskInstalled) {
-            alert('MetaMask is installed but not detected by RainbowKit. Please try refreshing the page.');
-          } else {
-            alert('MetaMask not found. Please install MetaMask extension.');
-          }
+          // If we get here, nothing worked
+          console.error('All connection methods failed');
+          alert('Unable to connect to MetaMask. Please check your browser extensions.');
         }}
         className="cursor-pointer group min-w-32"
       >

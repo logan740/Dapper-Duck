@@ -161,8 +161,8 @@
       // Larger buffer for mobile portrait so death zones are visible
       offScreenBuffer = 60; // 60px buffer for mobile portrait - makes death zones visible
     } else if (isMobile) {
-      // Small buffer for mobile landscape
-      offScreenBuffer = 10; // 10px buffer for mobile landscape
+      // Larger buffer for mobile landscape to keep items on screen
+      offScreenBuffer = 40; // 40px buffer for mobile landscape - keeps items visible
     } else if (isTablet) {
       // Small buffer for tablets
       offScreenBuffer = 15; // 15px buffer for tablets
@@ -175,8 +175,16 @@
     const virtualDeadZone = offScreenBuffer / scale;
     
     // Set both dead zones to the same simple value
-    TOP_DEAD_ZONE = virtualDeadZone;
-    BOTTOM_DEAD_ZONE = virtualDeadZone;
+    // For mobile portrait, make death zones smaller than visual danger zones
+    if (isMobile && isPortrait) {
+      // Death zones are 20px inside the visual danger zones
+      const innerDeadZone = Math.max(20, virtualDeadZone - 20);
+      TOP_DEAD_ZONE = innerDeadZone;
+      BOTTOM_DEAD_ZONE = innerDeadZone;
+    } else {
+      TOP_DEAD_ZONE = virtualDeadZone;
+      BOTTOM_DEAD_ZONE = virtualDeadZone;
+    }
     
     console.log('Mobile-optimized dead zones calculated:', {
       deviceType: isMobile ? 'mobile' : isTablet ? 'tablet' : 'desktop',
@@ -1157,16 +1165,20 @@
       return; // Don't show indicators on desktop or landscape
     }
     
+    // Calculate the visual danger zone size (larger than actual death zones)
+    const offScreenBuffer = 60; // Same as in calculateResponsiveDeadZones
+    const visualDeadZone = offScreenBuffer / scale;
+    
     // Draw warning zones at top and bottom
     ctx.save();
     
-    // Top death zone indicator
+    // Top death zone indicator (visual danger zone)
     ctx.fillStyle = 'rgba(255, 0, 0, 0.2)'; // Semi-transparent red
-    ctx.fillRect(0, 0, VIRTUAL_WIDTH, TOP_DEAD_ZONE);
+    ctx.fillRect(0, 0, VIRTUAL_WIDTH, visualDeadZone);
     
-    // Bottom death zone indicator  
+    // Bottom death zone indicator (visual danger zone)
     ctx.fillStyle = 'rgba(255, 0, 0, 0.2)'; // Semi-transparent red
-    ctx.fillRect(0, VIRTUAL_HEIGHT - BOTTOM_DEAD_ZONE, VIRTUAL_WIDTH, BOTTOM_DEAD_ZONE);
+    ctx.fillRect(0, VIRTUAL_HEIGHT - visualDeadZone, VIRTUAL_WIDTH, visualDeadZone);
     
     // Add warning text
     ctx.fillStyle = 'rgba(255, 0, 0, 0.8)';
@@ -1174,10 +1186,10 @@
     ctx.textAlign = 'center';
     
     // Top warning
-    ctx.fillText('⚠️ DANGER ZONE ⚠️', VIRTUAL_WIDTH / 2, TOP_DEAD_ZONE / 2 + 5);
+    ctx.fillText('⚠️ DANGER ZONE ⚠️', VIRTUAL_WIDTH / 2, visualDeadZone / 2 + 5);
     
     // Bottom warning
-    ctx.fillText('⚠️ DANGER ZONE ⚠️', VIRTUAL_WIDTH / 2, VIRTUAL_HEIGHT - BOTTOM_DEAD_ZONE / 2 + 5);
+    ctx.fillText('⚠️ DANGER ZONE ⚠️', VIRTUAL_WIDTH / 2, VIRTUAL_HEIGHT - visualDeadZone / 2 + 5);
     
     ctx.restore();
   }

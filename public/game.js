@@ -167,9 +167,8 @@
       // Small buffer for tablets
       offScreenBuffer = 15; // 15px buffer for tablets
     } else {
-      // For desktop with fill scaling, use a smaller buffer since death zones will be off-screen
-      // We'll make them visible through the visual indicators
-      offScreenBuffer = 30; // 30px buffer for desktop - death zones off-screen but visible via indicators
+      // For desktop, use a large buffer to make death zones visible ON-SCREEN
+      offScreenBuffer = 80; // 80px buffer for desktop - death zones visible on screen
     }
     
     // Convert the off-screen buffer to virtual canvas coordinates
@@ -1185,7 +1184,7 @@
     if (isMobile && isPortrait) {
       offScreenBuffer = 60; // Mobile portrait
     } else if (isDesktop) {
-      offScreenBuffer = 100; // Desktop - larger buffer for visual indicators
+      offScreenBuffer = 80; // Desktop - same as death zone buffer
     } else {
       offScreenBuffer = 60; // Default for all other devices
     }

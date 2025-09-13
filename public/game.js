@@ -1159,7 +1159,11 @@
   }
 
   function drawDeathZoneIndicators() {
-    // ALWAYS show death zone indicators - force them to show
+    // Only show death zone indicators during gameplay, not on home screen
+    if (state !== State.PLAY) {
+      return; // Don't show indicators on home screen or other states
+    }
+    
     const cssW = window.innerWidth;
     const cssH = window.innerHeight;
     // Fix device detection - desktop with height < 800 should be desktop, not mobile
@@ -1168,16 +1172,15 @@
     const isTablet = cssH >= 800 && cssH < 1200 && cssW < 1200;
     const isDesktop = !isMobile && !isTablet;
     
-    console.log('Death zone indicators:', { cssW, cssH, isMobile, isPortrait, isTablet, isDesktop });
-    console.log('FORCING death zone indicators to show for ALL devices');
+    console.log('Death zone indicators:', { cssW, cssH, isMobile, isPortrait, isTablet, isDesktop, gameState: state });
     
-    // ALWAYS show indicators - remove all conditions
-    // if (!(isMobile && isPortrait) && !isDesktop) {
-    //   console.log('Not showing indicators - device type not supported');
-    //   return; // Don't show indicators on mobile landscape or tablets
-    // }
+    // Only show indicators for mobile portrait and desktop during gameplay
+    if (!(isMobile && isPortrait) && !isDesktop) {
+      console.log('Not showing indicators - device type not supported');
+      return; // Don't show indicators on mobile landscape or tablets
+    }
     
-    console.log('Drawing death zone indicators for:', isMobile && isPortrait ? 'mobile-portrait' : isDesktop ? 'desktop' : 'other');
+    console.log('Drawing death zone indicators for:', isMobile && isPortrait ? 'mobile-portrait' : 'desktop');
     
     // Calculate the visual danger zone size (larger than actual death zones)
     let offScreenBuffer;

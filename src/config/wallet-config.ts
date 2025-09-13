@@ -13,7 +13,7 @@ export const config = getDefaultConfig({
   appName: 'Dapper Duck',
   projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'your-project-id',
   chains: [abstractTestnet],
-  ssr: false, // If your dApp uses server side rendering (SSR)
+  ssr: false,
 });
 
 // Export chain for use in other components

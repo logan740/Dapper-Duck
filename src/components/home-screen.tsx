@@ -601,6 +601,37 @@ export function HomeScreen() {
     }
   }, [address, isClient]);
 
+  // Set up window function for game.js to access profile data
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.getProfileData = () => {
+        // Create wallet-specific profile key
+        const profileKey = address ? `dapperDuck_profile_${address}` : 'dapperDuck_profile_anonymous';
+        
+        try {
+          // Get profile data from localStorage directly
+          const profileData = localStorage.getItem(profileKey);
+          if (profileData) {
+            const data = JSON.parse(profileData);
+            console.log('getProfileData returning from localStorage:', data);
+            return data;
+          }
+        } catch (error) {
+          console.error('Error getting profile data:', error);
+        }
+        
+        // Return current state as fallback
+        const fallbackData = {
+          name: profileName || '',
+          picture: profilePicture || '',
+          socials: socialLinks || { x: '', discord: '' }
+        };
+        console.log('getProfileData returning fallback:', fallbackData);
+        return fallbackData;
+      };
+    }
+  }, [address, profileName, profilePicture, socialLinks]);
+
   const tabs = [
     { id: 'home' as TabType, label: 'Home', icon: Gamepad2 },
     { id: 'leaderboard' as TabType, label: 'Leaderboard', icon: Trophy },

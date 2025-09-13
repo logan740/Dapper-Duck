@@ -68,11 +68,39 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
       {/* MetaMask Button */}
       <Button
         onClick={() => {
-          const metaMaskConnector = connectors.find(c => 
-            c.name.toLowerCase().includes('metamask')
-          );
-          if (metaMaskConnector) {
-            connect({ connector: metaMaskConnector });
+          // Try to open MetaMask extension directly
+          if (typeof window !== 'undefined' && (window as any).ethereum?.isMetaMask) {
+            // Direct MetaMask connection
+            (window as any).ethereum.request({ method: 'eth_requestAccounts' })
+              .then(() => {
+                // After MetaMask connects, try to use the connector
+                const metaMaskConnector = connectors.find(c => 
+                  c.name.toLowerCase().includes('metamask')
+                );
+                if (metaMaskConnector) {
+                  connect({ connector: metaMaskConnector });
+                }
+              })
+              .catch((error: any) => {
+                console.error('MetaMask connection failed:', error);
+                // Fallback to connector if direct connection fails
+                const metaMaskConnector = connectors.find(c => 
+                  c.name.toLowerCase().includes('metamask')
+                );
+                if (metaMaskConnector) {
+                  connect({ connector: metaMaskConnector });
+                }
+              });
+          } else {
+            // Use MetaMask connector
+            const metaMaskConnector = connectors.find(c => 
+              c.name.toLowerCase().includes('metamask')
+            );
+            if (metaMaskConnector) {
+              connect({ connector: metaMaskConnector });
+            } else {
+              console.error('MetaMask not found');
+            }
           }
         }}
         className="cursor-pointer group min-w-32"

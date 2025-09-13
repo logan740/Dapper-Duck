@@ -96,6 +96,7 @@ export function HomeScreen() {
     }, 500);
   };
 
+
   // Profile management functions
   const loadProfileData = () => {
     if (typeof window !== 'undefined') {

@@ -157,7 +157,7 @@
     // Different dead zone ratios for different device types
     let screenDeadZoneRatio;
     if (isMobile) {
-      screenDeadZoneRatio = 0.35; // 35% of screen height - very loose for mobile
+      screenDeadZoneRatio = 0.5; // 50% of screen height - extremely loose for mobile
     } else if (isTablet) {
       screenDeadZoneRatio = 0.12; // 12% of screen height - medium for tablets
     } else {
@@ -172,8 +172,8 @@
     // Set minimum and maximum dead zones based on device type
     let minDeadZone, maxDeadZone;
     if (isMobile) {
-      minDeadZone = 150; // Minimum 150px on mobile - very forgiving
-      maxDeadZone = 250; // Maximum 250px on mobile - definitely allows going off screen
+      minDeadZone = 200; // Minimum 200px on mobile - extremely forgiving
+      maxDeadZone = 350; // Maximum 350px on mobile - duck can go way off screen
     } else if (isTablet) {
       minDeadZone = 70;  // Minimum 70px on tablet
       maxDeadZone = 120; // Maximum 120px on tablet

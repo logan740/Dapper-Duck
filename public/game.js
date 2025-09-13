@@ -157,8 +157,8 @@
     // For mobile, make death zones very close to screen edges with more space
     let offScreenBuffer;
     if (isMobile) {
-      // Small buffer for mobile - death zones should be close to screen edges
-      offScreenBuffer = 8; // 8px buffer for mobile - close to screen edge
+      // Very small buffer for mobile - death zones should be at screen edges
+      offScreenBuffer = 5; // 5px buffer for mobile - almost at screen edge
     } else if (isTablet) {
       // Small buffer for tablets
       offScreenBuffer = 15; // 15px buffer for tablets
@@ -194,9 +194,9 @@
     // Use appropriate scaling for mobile vs desktop
     const isMobile = cssH > cssW || cssH < 800;
     if (isMobile) {
-      // On mobile, use fit scale to prevent left/right cutoff
-      // This ensures the entire game area is visible
-      scale = Math.min(cssW / VIRTUAL_WIDTH, cssH / VIRTUAL_HEIGHT);
+      // On mobile, use fill scale to fill the screen but center the content
+      // This prevents black bars while ensuring the duck is visible
+      scale = Math.max(cssW / VIRTUAL_WIDTH, cssH / VIRTUAL_HEIGHT);
       console.log('Mobile scaling:', { cssW, cssH, scale, offsetX: (cssW - VIRTUAL_WIDTH * scale) * 0.5 });
     } else {
       // On desktop, use fit scale to maintain aspect ratio
@@ -212,6 +212,7 @@
     canvas.style.position = 'absolute';
     canvas.style.top = '0';
     canvas.style.left = '0';
+    canvas.style.display = 'block';
 
     dpr = Math.max(1, window.devicePixelRatio || 1);
     canvas.width = Math.round(cssW * dpr);
@@ -252,6 +253,7 @@
 
   function setState(s) {
     state = s;
+    console.log('Game state changed to:', s, 'MENU:', State.MENU, 'PLAY:', State.PLAY, 'OVER:', State.OVER);
     elMenu.classList.toggle('hidden', state !== State.MENU);
     elHud.classList.toggle('hidden', state !== State.PLAY);
     elOver.classList.toggle('hidden', state !== State.OVER);
@@ -1284,6 +1286,7 @@
   }
 
   function gameOver(reason = 'Ouch!') {
+    console.log('Game Over called with reason:', reason, 'Current state:', state);
     // Update stats
     gameStats.gamesPlayed++;
     gameStats.totalPlayTime += timeAlive;
@@ -1500,6 +1503,7 @@
   window.trackPaidGameRevenue = trackPaidGameRevenue;
 
   // Start the game
+  console.log('Initializing game, setting state to MENU');
   setState(State.MENU);
   requestAnimationFrame(loop);
 })();

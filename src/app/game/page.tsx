@@ -82,12 +82,20 @@ export default function GamePage() {
   }, [address]);
 
   return (
-    <div className="relative w-screen h-[100svh] overflow-hidden touch-none select-none">
+    <div className="relative w-screen h-screen overflow-hidden touch-none select-none" style={{ height: '100vh' }}>
       {/* Game Canvas */}
       <canvas 
         id="game" 
         className="absolute inset-0 w-full h-full touch-none select-none" 
-        style={{ touchAction: 'none', userSelect: 'none' }}
+        style={{ 
+          touchAction: 'none', 
+          userSelect: 'none',
+          width: '100vw',
+          height: '100vh',
+          position: 'absolute',
+          top: 0,
+          left: 0
+        }}
       />
 
       {/* Score HUD - Always visible during gameplay */}

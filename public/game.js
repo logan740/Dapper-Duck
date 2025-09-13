@@ -175,8 +175,8 @@
     const virtualDeadZone = offScreenBuffer / scale;
     
     // Set both dead zones to the same simple value
-    // For mobile portrait and desktop, make death zones smaller than visual danger zones
-    if ((isMobile && isPortrait) || (!isMobile && !isTablet)) {
+    // For mobile portrait, make death zones smaller than visual danger zones
+    if (isMobile && isPortrait) {
       // Death zones are 20px inside the visual danger zones
       const innerDeadZone = Math.max(20, virtualDeadZone - 20);
       TOP_DEAD_ZONE = innerDeadZone;

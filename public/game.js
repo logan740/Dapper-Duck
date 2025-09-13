@@ -191,19 +191,14 @@
     const cssW = window.innerWidth;
     const cssH = window.innerHeight;
 
-    // Use different scaling approaches for mobile vs desktop
-    const isMobile = cssH > cssW || cssH < 800;
-    if (isMobile) {
-      // On mobile, use fit scale to prevent duck cutoff
-      scale = Math.min(cssW / VIRTUAL_WIDTH, cssH / VIRTUAL_HEIGHT);
-    } else {
-      // On desktop, use fill scale to avoid black bars
-      scale = Math.max(cssW / VIRTUAL_WIDTH, cssH / VIRTUAL_HEIGHT);
-    }
+    // Use fill scale for both platforms to ensure full screen coverage
+    // CSS objectFit: 'cover' will handle the visual scaling
+    scale = Math.max(cssW / VIRTUAL_WIDTH, cssH / VIRTUAL_HEIGHT);
     
     offsetX = (cssW - VIRTUAL_WIDTH * scale) * 0.5;
     offsetY = (cssH - VIRTUAL_HEIGHT * scale) * 0.5;
     
+    const isMobile = cssH > cssW || cssH < 800;
     console.log('Scaling:', { cssW, cssH, scale, offsetX, offsetY, isMobile });
 
     // Ensure canvas fills the full viewport

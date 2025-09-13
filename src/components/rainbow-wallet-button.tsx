@@ -73,6 +73,7 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
         onClick={async () => {
           console.log('=== MetaMask Connection Debug ===');
           console.log('Available connectors:', connectors.map(c => ({ name: c.name, id: c.id, type: c.type })));
+          console.log('Full connector details:', connectors);
           
           // Check if MetaMask is specifically available
           const isMetaMaskInstalled = typeof window !== 'undefined' && 
@@ -132,6 +133,20 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
                 method: 'eth_requestAccounts' 
               });
               console.log('Direct MetaMask connection successful:', accounts);
+              
+              // Try to force wagmi to recognize the connection by trying all connectors again
+              console.log('Attempting to sync wagmi state after direct connection...');
+              for (const connector of connectors) {
+                try {
+                  // Try to connect without user interaction (should work if already connected)
+                  await connect({ connector });
+                  console.log(`Successfully synced wagmi state with ${connector.name}!`);
+                  return;
+                } catch (error) {
+                  console.log(`Failed to sync with ${connector.name}:`, error instanceof Error ? error.message : String(error));
+                }
+              }
+              
               alert('MetaMask connected directly but UI may not update. Please refresh the page.');
               return;
             } catch (error) {

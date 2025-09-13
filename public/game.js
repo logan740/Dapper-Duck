@@ -158,10 +158,10 @@
     let offScreenBuffer;
     if (isMobile) {
       // Very minimal buffer for mobile - death zones should be at screen edges
-      offScreenBuffer = 5; // 5px buffer for mobile - almost at screen edge
+      offScreenBuffer = 2; // 2px buffer for mobile - almost at screen edge
     } else if (isTablet) {
       // Small buffer for tablets
-      offScreenBuffer = 15; // 15px buffer for tablets
+      offScreenBuffer = 10; // 10px buffer for tablets
     } else {
       // Standard buffer for desktop
       offScreenBuffer = 40; // 40px buffer for desktop
@@ -191,7 +191,7 @@
     const cssW = window.innerWidth;
     const cssH = window.innerHeight;
 
-    // Use fill scale for mobile to ensure canvas fills the screen
+    // Use appropriate scaling for mobile vs desktop
     const isMobile = cssH > cssW || cssH < 800;
     if (isMobile) {
       // On mobile, use fill scale to ensure the canvas covers the entire screen

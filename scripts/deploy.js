@@ -1,7 +1,8 @@
-const { ethers } = require("hardhat");
+const { ethers, network } = require("hardhat");
 
 async function main() {
   console.log("Deploying DapperDuck contract...");
+  console.log("Network:", network.name);
 
   // Get the contract factory
   const DapperDuck = await ethers.getContractFactory("DapperDuck");

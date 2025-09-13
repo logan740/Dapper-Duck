@@ -9,11 +9,30 @@ import { useAccount } from "wagmi";
 export default function GamePage() {
   const { address } = useAccount();
 
-  // Ensure full-viewport sizing for canvas
+  // Ensure full-viewport sizing for canvas and mobile optimization
   useEffect(() => {
     document.documentElement.style.height = "100%";
     document.body.style.height = "100%";
     document.body.style.margin = "0";
+    document.body.style.overflow = "hidden";
+    document.body.style.touchAction = "none";
+    document.body.style.userSelect = "none";
+    
+    // Prevent mobile browser UI from interfering
+    const preventDefault = (e: Event) => {
+      e.preventDefault();
+    };
+    
+    // Add touch event listeners to prevent default behaviors
+    document.addEventListener('touchstart', preventDefault, { passive: false });
+    document.addEventListener('touchmove', preventDefault, { passive: false });
+    document.addEventListener('touchend', preventDefault, { passive: false });
+    
+    return () => {
+      document.removeEventListener('touchstart', preventDefault);
+      document.removeEventListener('touchmove', preventDefault);
+      document.removeEventListener('touchend', preventDefault);
+    };
   }, []);
 
   // Set up getProfileData function for the game
@@ -42,9 +61,13 @@ export default function GamePage() {
   }, [address]);
 
   return (
-    <div className="relative w-screen h-[100svh] overflow-hidden">
+    <div className="relative w-screen h-[100svh] overflow-hidden touch-none select-none">
       {/* Game Canvas */}
-      <canvas id="game" className="absolute inset-0 w-full h-full" />
+      <canvas 
+        id="game" 
+        className="absolute inset-0 w-full h-full touch-none select-none" 
+        style={{ touchAction: 'none', userSelect: 'none' }}
+      />
 
       {/* Score HUD - Always visible during gameplay */}
       <div id="hud" className="absolute top-4 left-4 z-40">

@@ -154,9 +154,18 @@
     const isMobile = cssH > cssW || cssH < 800; // Portrait orientation or small height
     const isTablet = cssH >= 800 && cssH < 1200 && cssW < 1200;
     
-    // Simple approach: death lines just slightly off screen for all devices
-    // This allows the duck to go to the very edge of the screen and just a little beyond
-    const offScreenBuffer = 50; // 50px buffer off screen for all devices
+    // Mobile-optimized boundary calculation
+    let offScreenBuffer;
+    if (isMobile) {
+      // More generous boundaries for mobile - allow duck to go further off screen
+      offScreenBuffer = 80; // 80px buffer for mobile
+    } else if (isTablet) {
+      // Medium boundaries for tablets
+      offScreenBuffer = 60; // 60px buffer for tablets
+    } else {
+      // Tighter boundaries for desktop
+      offScreenBuffer = 40; // 40px buffer for desktop
+    }
     
     // Convert the off-screen buffer to virtual canvas coordinates
     const virtualDeadZone = offScreenBuffer / scale;
@@ -165,7 +174,7 @@
     TOP_DEAD_ZONE = virtualDeadZone;
     BOTTOM_DEAD_ZONE = virtualDeadZone;
     
-    console.log('Simple dead zones calculated:', {
+    console.log('Mobile-optimized dead zones calculated:', {
       deviceType: isMobile ? 'mobile' : isTablet ? 'tablet' : 'desktop',
       screenWidth: cssW,
       screenHeight: cssH,
@@ -356,6 +365,11 @@
   let inputDown = false;
   let lastInputTime = 0;
   const INPUT_DEBOUNCE = 50; // 50ms debounce
+  
+  // Mobile device detection
+  const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const isAndroid = /Android/.test(navigator.userAgent);
 
   function onPress(e) {
     const now = Date.now();
@@ -364,7 +378,18 @@
 
     if (state === State.PLAY) tryFlap();
     inputDown = true;
-    if (e && e.preventDefault) e.preventDefault();
+    
+    // Enhanced mobile touch handling
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      // iOS-specific handling
+      if (isIOS && e.type === 'touchstart') {
+        // Prevent iOS bounce scrolling
+        e.preventDefault();
+      }
+    }
   }
 
   function onRelease() { 
@@ -380,12 +405,18 @@
     if (e.code === 'Space' || e.code === 'ArrowUp') onRelease();
   });
 
+  // Enhanced mobile touch handling
   ['pointerdown','mousedown','touchstart'].forEach(ev => {
-    window.addEventListener(ev, onPress, { passive: false });
+    window.addEventListener(ev, onPress, { passive: false, capture: true });
   });
   ['pointerup','mouseup','touchend','touchcancel','pointercancel'].forEach(ev => {
-    window.addEventListener(ev, onRelease, { passive: true });
+    window.addEventListener(ev, onRelease, { passive: true, capture: true });
   });
+  
+  // Additional mobile-specific event handling
+  document.addEventListener('touchstart', onPress, { passive: false, capture: true });
+  document.addEventListener('touchend', onRelease, { passive: true, capture: true });
+  document.addEventListener('touchcancel', onRelease, { passive: true, capture: true });
 
   window.addEventListener('blur', onRelease);
   document.addEventListener('visibilitychange', () => {

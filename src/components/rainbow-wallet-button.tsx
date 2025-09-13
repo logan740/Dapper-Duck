@@ -70,8 +70,9 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
       
       {/* MetaMask Button */}
       <Button
-        onClick={() => {
-          console.log('Available connectors:', connectors.map(c => ({ name: c.name, id: c.id })));
+        onClick={async () => {
+          console.log('=== MetaMask Connection Debug ===');
+          console.log('Available connectors:', connectors.map(c => ({ name: c.name, id: c.id, type: c.type })));
           
           // Check if MetaMask is specifically available
           const isMetaMaskInstalled = typeof window !== 'undefined' && 
@@ -79,45 +80,63 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
             (window as any).ethereum.isMetaMask;
           
           console.log('MetaMask installed:', isMetaMaskInstalled);
+          console.log('window.ethereum:', (window as any).ethereum);
           
-          // Try to find MetaMask connector specifically
+          // Try direct MetaMask connection first (most reliable)
+          if (isMetaMaskInstalled) {
+            try {
+              console.log('Attempting direct MetaMask connection...');
+              const accounts = await (window as any).ethereum.request({ 
+                method: 'eth_requestAccounts' 
+              });
+              console.log('MetaMask connected successfully:', accounts);
+              return;
+            } catch (error) {
+              console.error('Direct MetaMask connection failed:', error);
+            }
+          }
+          
+          // Fallback to RainbowKit connector
           let metaMaskConnector = connectors.find(c => 
             c.name.toLowerCase() === 'metamask' || 
             c.id.toLowerCase() === 'metamask' ||
             (c.name.toLowerCase().includes('metamask') && !c.name.toLowerCase().includes('magic'))
           );
           
-          // If MetaMask is installed but connector not found, try injected but verify it's MetaMask
-          if (!metaMaskConnector && isMetaMaskInstalled) {
-            const injectedConnector = connectors.find(c => 
+          // If still not found, try injected connector
+          if (!metaMaskConnector) {
+            metaMaskConnector = connectors.find(c => 
               c.id === 'injected' || c.name.toLowerCase().includes('injected')
             );
-            
-            // Only use injected if we can verify it's MetaMask
-            if (injectedConnector && (window as any).ethereum.isMetaMask) {
-              metaMaskConnector = injectedConnector;
-              console.log('Using injected connector for MetaMask');
-            }
+            console.log('Using injected connector as fallback:', metaMaskConnector);
           }
           
           console.log('Found MetaMask connector:', metaMaskConnector);
           
           if (metaMaskConnector) {
-            console.log('Attempting to connect with MetaMask...');
-            connect({ connector: metaMaskConnector });
-          } else if (isMetaMaskInstalled) {
-            console.log('MetaMask detected, attempting direct connection...');
-            // Direct connection to MetaMask
-            (window as any).ethereum.request({ method: 'eth_requestAccounts' })
-              .then((accounts: string[]) => {
-                console.log('MetaMask connected:', accounts);
-              })
-              .catch((error: any) => {
-                console.error('MetaMask connection failed:', error);
-              });
+            try {
+              console.log('Attempting to connect with RainbowKit connector...');
+              await connect({ connector: metaMaskConnector });
+              console.log('RainbowKit connection successful');
+            } catch (error) {
+              console.error('RainbowKit connection failed:', error);
+              // Try direct connection as last resort
+              if (isMetaMaskInstalled) {
+                try {
+                  await (window as any).ethereum.request({ method: 'eth_requestAccounts' });
+                  console.log('Fallback direct connection successful');
+                } catch (fallbackError) {
+                  console.error('Fallback connection also failed:', fallbackError);
+                }
+              }
+            }
           } else {
-            console.error('MetaMask not found. Available connectors:', connectors);
-            alert('MetaMask not found. Please install MetaMask extension.');
+            console.error('No MetaMask connector found');
+            if (isMetaMaskInstalled) {
+              alert('MetaMask is installed but not detected by RainbowKit. Please try refreshing the page.');
+            } else {
+              alert('MetaMask not found. Please install MetaMask extension.');
+            }
           }
         }}
         className="cursor-pointer group min-w-32"

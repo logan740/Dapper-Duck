@@ -167,8 +167,8 @@
       // Small buffer for tablets
       offScreenBuffer = 15; // 15px buffer for tablets
     } else {
-      // Smaller buffer for desktop since we're using fit scaling
-      offScreenBuffer = 30; // 30px buffer for desktop - death zones will be visible
+      // Larger buffer for desktop to make death zones clearly visible
+      offScreenBuffer = 80; // 80px buffer for desktop - death zones clearly visible
     }
     
     // Convert the off-screen buffer to virtual canvas coordinates
@@ -195,7 +195,8 @@
       offScreenBuffer: offScreenBuffer,
       virtualDeadZone: virtualDeadZone,
       topDeadZone: TOP_DEAD_ZONE,
-      bottomDeadZone: BOTTOM_DEAD_ZONE
+      bottomDeadZone: BOTTOM_DEAD_ZONE,
+      isPortrait: isPortrait
     });
   }
 
@@ -1163,7 +1164,10 @@
     const cssH = window.innerHeight;
     const isMobile = cssH > cssW || cssH < 800;
     const isPortrait = cssH > cssW;
-    const isDesktop = !isMobile && !(cssH >= 800 && cssH < 1200 && cssW < 1200);
+    const isTablet = cssH >= 800 && cssH < 1200 && cssW < 1200;
+    const isDesktop = !isMobile && !isTablet;
+    
+    console.log('Death zone indicators:', { cssW, cssH, isMobile, isPortrait, isTablet, isDesktop });
     
     if (!(isMobile && isPortrait) && !isDesktop) {
       return; // Don't show indicators on mobile landscape or tablets
@@ -1174,7 +1178,7 @@
     if (isMobile && isPortrait) {
       offScreenBuffer = 60; // Mobile portrait
     } else if (isDesktop) {
-      offScreenBuffer = 30; // Desktop
+      offScreenBuffer = 80; // Desktop
     } else {
       offScreenBuffer = 40; // Mobile landscape
     }

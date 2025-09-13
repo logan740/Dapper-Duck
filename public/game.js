@@ -151,7 +151,7 @@
     const offsetY = (cssH - renderedHeight) * 0.5;
     
     // Detect if this is likely a mobile device based on screen size and aspect ratio
-    const isMobile = cssH > cssW || cssH < 800; // Portrait orientation or small height
+    const isMobile = (cssH > cssW && cssH < 800) || cssH < 600; // Portrait orientation or very small height
     const isTablet = cssH >= 800 && cssH < 1200 && cssW < 1200;
     
     // For mobile portrait, we need larger death zones that are visible on screen
@@ -205,7 +205,7 @@
     const cssH = window.innerHeight;
 
     // Detect mobile portrait orientation specifically
-    const isMobile = cssH > cssW || cssH < 800;
+    const isMobile = (cssH > cssW && cssH < 800) || cssH < 600;
     const isPortrait = cssH > cssW;
     
     if (isMobile && isPortrait) {
@@ -1159,23 +1159,25 @@
   }
 
   function drawDeathZoneIndicators() {
-    // Show death zone indicators on mobile portrait and desktop
+    // ALWAYS show death zone indicators - force them to show
     const cssW = window.innerWidth;
     const cssH = window.innerHeight;
-    const isMobile = cssH > cssW || cssH < 800;
+    // Fix device detection - desktop with height < 800 should be desktop, not mobile
+    const isMobile = (cssH > cssW && cssH < 800) || cssH < 600;
     const isPortrait = cssH > cssW;
     const isTablet = cssH >= 800 && cssH < 1200 && cssW < 1200;
     const isDesktop = !isMobile && !isTablet;
     
     console.log('Death zone indicators:', { cssW, cssH, isMobile, isPortrait, isTablet, isDesktop });
+    console.log('FORCING death zone indicators to show for ALL devices');
     
-    // FORCE desktop indicators to show - remove the condition for now
-    if (!(isMobile && isPortrait) && !isDesktop) {
-      console.log('Not showing indicators - device type not supported');
-      return; // Don't show indicators on mobile landscape or tablets
-    }
+    // ALWAYS show indicators - remove all conditions
+    // if (!(isMobile && isPortrait) && !isDesktop) {
+    //   console.log('Not showing indicators - device type not supported');
+    //   return; // Don't show indicators on mobile landscape or tablets
+    // }
     
-    console.log('Drawing death zone indicators for:', isMobile && isPortrait ? 'mobile-portrait' : 'desktop');
+    console.log('Drawing death zone indicators for:', isMobile && isPortrait ? 'mobile-portrait' : isDesktop ? 'desktop' : 'other');
     
     // Calculate the visual danger zone size (larger than actual death zones)
     let offScreenBuffer;
@@ -1184,38 +1186,31 @@
     } else if (isDesktop) {
       offScreenBuffer = 80; // Desktop
     } else {
-      offScreenBuffer = 40; // Mobile landscape
+      offScreenBuffer = 60; // Default for all other devices
     }
+    
+    console.log('Using offScreenBuffer:', offScreenBuffer, 'for device type:', isMobile && isPortrait ? 'mobile-portrait' : isDesktop ? 'desktop' : 'other');
     const visualDeadZone = offScreenBuffer / scale;
     
     // Draw warning zones at top and bottom
     ctx.save();
     
-    if (isMobile && isPortrait) {
-      // Mobile portrait: Full warning with text
-      ctx.fillStyle = 'rgba(255, 0, 0, 0.2)'; // Semi-transparent red
-      ctx.fillRect(0, 0, VIRTUAL_WIDTH, visualDeadZone);
-      ctx.fillRect(0, VIRTUAL_HEIGHT - visualDeadZone, VIRTUAL_WIDTH, visualDeadZone);
-      
-      // Add warning text
-      ctx.fillStyle = 'rgba(255, 0, 0, 0.8)';
-      ctx.font = 'bold 16px Arial';
-      ctx.textAlign = 'center';
-      ctx.fillText('⚠️ DANGER ZONE ⚠️', VIRTUAL_WIDTH / 2, visualDeadZone / 2 + 5);
-      ctx.fillText('⚠️ DANGER ZONE ⚠️', VIRTUAL_WIDTH / 2, VIRTUAL_HEIGHT - visualDeadZone / 2 + 5);
-    } else if (isDesktop) {
-      // Desktop: Full danger zones like mobile portrait
-      ctx.fillStyle = 'rgba(255, 0, 0, 0.3)'; // Semi-transparent red
-      ctx.fillRect(0, 0, VIRTUAL_WIDTH, visualDeadZone);
-      ctx.fillRect(0, VIRTUAL_HEIGHT - visualDeadZone, VIRTUAL_WIDTH, visualDeadZone);
-      
-      // Add warning text
-      ctx.fillStyle = 'rgba(255, 0, 0, 0.9)';
-      ctx.font = 'bold 18px Arial';
-      ctx.textAlign = 'center';
-      ctx.fillText('⚠️ DANGER ZONE ⚠️', VIRTUAL_WIDTH / 2, visualDeadZone / 2 + 5);
-      ctx.fillText('⚠️ DANGER ZONE ⚠️', VIRTUAL_WIDTH / 2, VIRTUAL_HEIGHT - visualDeadZone / 2 + 5);
-    }
+    // ALWAYS draw danger zones for ALL devices
+    console.log('Drawing danger zones with visualDeadZone:', visualDeadZone);
+    
+    // Full danger zones for all devices
+    ctx.fillStyle = 'rgba(255, 0, 0, 0.4)'; // More visible red
+    ctx.fillRect(0, 0, VIRTUAL_WIDTH, visualDeadZone);
+    ctx.fillRect(0, VIRTUAL_HEIGHT - visualDeadZone, VIRTUAL_WIDTH, visualDeadZone);
+    
+    // Add warning text for all devices
+    ctx.fillStyle = 'rgba(255, 0, 0, 1.0)'; // Solid red text
+    ctx.font = 'bold 20px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('⚠️ DANGER ZONE ⚠️', VIRTUAL_WIDTH / 2, visualDeadZone / 2 + 5);
+    ctx.fillText('⚠️ DANGER ZONE ⚠️', VIRTUAL_WIDTH / 2, VIRTUAL_HEIGHT - visualDeadZone / 2 + 5);
+    
+    console.log('Danger zones drawn at:', { top: visualDeadZone, bottom: VIRTUAL_HEIGHT - visualDeadZone });
     
     ctx.restore();
   }

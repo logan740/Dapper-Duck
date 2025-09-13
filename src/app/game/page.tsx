@@ -4,14 +4,42 @@ import Script from "next/script";
 import { useEffect } from "react";
 import { ConnectWalletButton } from "@/components/connect-wallet-button";
 import Link from "next/link";
+import { useAccount } from "wagmi";
 
 export default function GamePage() {
+  const { address } = useAccount();
+
   // Ensure full-viewport sizing for canvas
   useEffect(() => {
     document.documentElement.style.height = "100%";
     document.body.style.height = "100%";
     document.body.style.margin = "0";
   }, []);
+
+  // Set up getProfileData function for the game
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.getProfileData = () => {
+        const profileKey = address ? `dapperDuck_profile_${address}` : 'dapperDuck_profile_anonymous';
+        try {
+          const profileData = localStorage.getItem(profileKey);
+          if (profileData) {
+            const data = JSON.parse(profileData);
+            console.log('Game page getProfileData returning:', data);
+            return data;
+          }
+        } catch (error) {
+          console.error('Error getting profile data in game page:', error);
+        }
+        return {
+          name: '',
+          picture: '',
+          socials: { x: '', discord: '' }
+        };
+      };
+      console.log('Game page: getProfileData function set up for address:', address);
+    }
+  }, [address]);
 
   return (
     <div className="relative w-screen h-[100svh] overflow-hidden">

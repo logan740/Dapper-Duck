@@ -629,8 +629,35 @@ export function HomeScreen() {
         console.log('getProfileData returning fallback:', fallbackData);
         return fallbackData;
       };
+      
+      // Also set it immediately on window object to ensure it's available
+      console.log('Setting up window.getProfileData function');
     }
   }, [address, profileName, profilePicture, socialLinks]);
+
+  // Additional effect to ensure the function is available immediately
+  useEffect(() => {
+    if (typeof window !== 'undefined' && isClient) {
+      // Force set the function again to ensure it's available
+      window.getProfileData = () => {
+        const profileKey = address ? `dapperDuck_profile_${address}` : 'dapperDuck_profile_anonymous';
+        try {
+          const profileData = localStorage.getItem(profileKey);
+          if (profileData) {
+            return JSON.parse(profileData);
+          }
+        } catch (error) {
+          console.error('Error getting profile data:', error);
+        }
+        return {
+          name: profileName || '',
+          picture: profilePicture || '',
+          socials: socialLinks || { x: '', discord: '' }
+        };
+      };
+      console.log('getProfileData function set up, address:', address);
+    }
+  }, [isClient, address]);
 
   const tabs = [
     { id: 'home' as TabType, label: 'Home', icon: Gamepad2 },

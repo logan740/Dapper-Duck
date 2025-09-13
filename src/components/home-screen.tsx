@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ConnectWalletButton } from "@/components/connect-wallet-button";
+import { MultiWalletButton } from "@/components/multi-wallet-button";
 import { useAccount } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -1497,7 +1497,7 @@ export function HomeScreen() {
                       <User className="w-4 h-4 mr-2" />
                       Refresh Profile
                     </Button>
-                    <ConnectWalletButton />
+                    <MultiWalletButton />
                   </div>
                 </div>
               )}
@@ -1707,7 +1707,7 @@ export function HomeScreen() {
                 Dapper Duck
               </span>
             </div>
-            <ConnectWalletButton />
+            <MultiWalletButton />
           </div>
         </div>
       </header>

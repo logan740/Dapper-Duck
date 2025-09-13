@@ -18,8 +18,19 @@ export default function GamePage() {
     document.body.style.touchAction = "none";
     document.body.style.userSelect = "none";
     
-    // Prevent mobile browser UI from interfering
+    // Prevent mobile browser UI from interfering, but allow button clicks
     const preventDefault = (e: Event) => {
+      // Don't prevent default for button clicks or interactive elements
+      const target = e.target as HTMLElement;
+      if (target && (
+        target.tagName === 'BUTTON' || 
+        target.tagName === 'A' || 
+        target.closest('button') ||
+        target.closest('a') ||
+        target.closest('[role="button"]')
+      )) {
+        return; // Allow button clicks
+      }
       e.preventDefault();
     };
     

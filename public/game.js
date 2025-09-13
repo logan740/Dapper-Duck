@@ -158,7 +158,7 @@
     let offScreenBuffer;
     if (isMobile) {
       // Small buffer for mobile - death zones should be close to screen edges
-      offScreenBuffer = 5; // 5px buffer for mobile
+      offScreenBuffer = 10; // 10px buffer for mobile
     } else if (isTablet) {
       // Small buffer for tablets
       offScreenBuffer = 15; // 15px buffer for tablets
@@ -191,20 +191,14 @@
     const cssW = window.innerWidth;
     const cssH = window.innerHeight;
 
-    // Use appropriate scaling for mobile vs desktop
-    const isMobile = cssH > cssW || cssH < 800;
-    if (isMobile) {
-      // On mobile, use fit scale to prevent left/right cutoff
-      // This ensures the entire game area is visible without cutting off the duck
-      scale = Math.min(cssW / VIRTUAL_WIDTH, cssH / VIRTUAL_HEIGHT);
-      console.log('Mobile scaling:', { cssW, cssH, scale, offsetX: (cssW - VIRTUAL_WIDTH * scale) * 0.5 });
-    } else {
-      // On desktop, use fill scale to avoid black bars and fill the screen
-      scale = Math.max(cssW / VIRTUAL_WIDTH, cssH / VIRTUAL_HEIGHT);
-    }
+    // Use fill scale for both mobile and desktop to avoid black bars
+    // This ensures the game fills the entire screen on both platforms
+    scale = Math.max(cssW / VIRTUAL_WIDTH, cssH / VIRTUAL_HEIGHT);
     
     offsetX = (cssW - VIRTUAL_WIDTH * scale) * 0.5;
     offsetY = (cssH - VIRTUAL_HEIGHT * scale) * 0.5;
+    
+    console.log('Scaling:', { cssW, cssH, scale, offsetX, offsetY, isMobile: cssH > cssW || cssH < 800 });
 
     // Ensure canvas fills the full viewport
     canvas.style.width = cssW + 'px';

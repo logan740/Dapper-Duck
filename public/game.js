@@ -191,14 +191,20 @@
     const cssW = window.innerWidth;
     const cssH = window.innerHeight;
 
-    // Use fill scale for both mobile and desktop to avoid black bars
-    // This ensures the game fills the entire screen on both platforms
-    scale = Math.max(cssW / VIRTUAL_WIDTH, cssH / VIRTUAL_HEIGHT);
+    // Use different scaling approaches for mobile vs desktop
+    const isMobile = cssH > cssW || cssH < 800;
+    if (isMobile) {
+      // On mobile, use fit scale to prevent duck cutoff
+      scale = Math.min(cssW / VIRTUAL_WIDTH, cssH / VIRTUAL_HEIGHT);
+    } else {
+      // On desktop, use fill scale to avoid black bars
+      scale = Math.max(cssW / VIRTUAL_WIDTH, cssH / VIRTUAL_HEIGHT);
+    }
     
     offsetX = (cssW - VIRTUAL_WIDTH * scale) * 0.5;
     offsetY = (cssH - VIRTUAL_HEIGHT * scale) * 0.5;
     
-    console.log('Scaling:', { cssW, cssH, scale, offsetX, offsetY, isMobile: cssH > cssW || cssH < 800 });
+    console.log('Scaling:', { cssW, cssH, scale, offsetX, offsetY, isMobile });
 
     // Ensure canvas fills the full viewport
     canvas.style.width = cssW + 'px';

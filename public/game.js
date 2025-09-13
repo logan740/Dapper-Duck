@@ -158,7 +158,7 @@
     let offScreenBuffer;
     if (isMobile) {
       // Small buffer for mobile - death zones should be close to screen edges
-      offScreenBuffer = 20; // 20px buffer for mobile
+      offScreenBuffer = 10; // 10px buffer for mobile
     } else if (isTablet) {
       // Small buffer for tablets
       offScreenBuffer = 15; // 15px buffer for tablets
@@ -194,9 +194,9 @@
     // Use appropriate scaling for mobile vs desktop
     const isMobile = cssH > cssW || cssH < 800;
     if (isMobile) {
-      // On mobile, use fill scale to fill the screen but center the content
-      // This prevents black bars while ensuring the duck is visible
-      scale = Math.max(cssW / VIRTUAL_WIDTH, cssH / VIRTUAL_HEIGHT);
+      // On mobile, use fit scale to prevent left/right cutoff
+      // This ensures the entire game area is visible without cutting off the duck
+      scale = Math.min(cssW / VIRTUAL_WIDTH, cssH / VIRTUAL_HEIGHT);
       console.log('Mobile scaling:', { cssW, cssH, scale, offsetX: (cssW - VIRTUAL_WIDTH * scale) * 0.5 });
     } else {
       // On desktop, use fit scale to maintain aspect ratio
@@ -507,7 +507,8 @@
   function spawnFudBag() {
     const img = fudImages[Math.floor(Math.random() * fudImages.length)];
     // Ensure FUD bags stay at least 5px from screen edges on both mobile and PC
-    const margin = Math.max(TOP_DEAD_ZONE, BOTTOM_DEAD_ZONE) + 5;
+    // Use a larger margin to account for scaling and ensure visibility
+    const margin = Math.max(TOP_DEAD_ZONE, BOTTOM_DEAD_ZONE) + 20;
     const difficulty = getDifficultyLevel();
     
     // More aggressive patterns at higher difficulty
@@ -529,7 +530,8 @@
   function spawnZeroScoreFudBag() {
     const img = fudImages[Math.floor(Math.random() * fudImages.length)];
     // Ensure zero-score FUD bags stay at least 5px from screen edges on both mobile and PC
-    const margin = Math.max(TOP_DEAD_ZONE, BOTTOM_DEAD_ZONE) + 5;
+    // Use a larger margin to account for scaling and ensure visibility
+    const margin = Math.max(TOP_DEAD_ZONE, BOTTOM_DEAD_ZONE) + 20;
     const difficulty = getDifficultyLevel();
     
     // Zero-score FUD bags are less frequent and get more frequent over time
@@ -804,7 +806,8 @@
     lastSnackPoints = choice.points;
 
     // Ensure snacks stay at least 5px from screen edges on both mobile and PC
-    const margin = Math.max(TOP_DEAD_ZONE, BOTTOM_DEAD_ZONE) + 5;
+    // Use a larger margin to account for scaling and ensure visibility
+    const margin = Math.max(TOP_DEAD_ZONE, BOTTOM_DEAD_ZONE) + 20;
     const snack = {
       x: VIRTUAL_WIDTH + 40,
       y: Math.random() * (VIRTUAL_HEIGHT - margin*2 - SNACK_SIZE) + margin,
@@ -980,7 +983,8 @@
     const powerup = POWERUP_TYPES[type];
     
     // Ensure power-ups stay at least 5px from screen edges on both mobile and PC
-    const margin = Math.max(TOP_DEAD_ZONE, BOTTOM_DEAD_ZONE) + 5;
+    // Use a larger margin to account for scaling and ensure visibility
+    const margin = Math.max(TOP_DEAD_ZONE, BOTTOM_DEAD_ZONE) + 20;
     activePowerup = {
       x: VIRTUAL_WIDTH + 40,
       y: Math.random() * (VIRTUAL_HEIGHT - margin*2 - POWERUP_SIZE) + margin,

@@ -82,15 +82,45 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
           console.log('MetaMask installed:', isMetaMaskInstalled);
           console.log('window.ethereum:', (window as any).ethereum);
           
-          // Try ALL available connectors to see which one works
-          for (const connector of connectors) {
-            console.log(`Trying connector: ${connector.name} (${connector.id})`);
+          // Find MetaMask connector specifically (exclude Abstract)
+          let metaMaskConnector = connectors.find(c => 
+            (c.name.toLowerCase() === 'metamask' || 
+             c.id.toLowerCase() === 'metamask' ||
+             (c.name.toLowerCase().includes('metamask') && !c.name.toLowerCase().includes('magic'))) &&
+            !c.name.toLowerCase().includes('abstract') &&
+            !c.id.toLowerCase().includes('abstract') &&
+            !c.id.toLowerCase().includes('privy')
+          );
+          
+          console.log('Found MetaMask connector:', metaMaskConnector);
+          
+          // If MetaMask connector found, use it
+          if (metaMaskConnector) {
             try {
-              await connect({ connector });
-              console.log(`Successfully connected with ${connector.name}!`);
+              console.log(`Attempting to connect with MetaMask: ${metaMaskConnector.name} (${metaMaskConnector.id})`);
+              await connect({ connector: metaMaskConnector });
+              console.log(`Successfully connected with MetaMask!`);
               return;
             } catch (error) {
-              console.log(`Failed to connect with ${connector.name}:`, error instanceof Error ? error.message : String(error));
+              console.log(`Failed to connect with MetaMask:`, error instanceof Error ? error.message : String(error));
+            }
+          }
+          
+          // If no MetaMask connector found, try injected connector (but verify it's MetaMask)
+          const injectedConnector = connectors.find(c => 
+            (c.id === 'injected' || c.name.toLowerCase().includes('injected')) &&
+            !c.name.toLowerCase().includes('abstract') &&
+            !c.id.toLowerCase().includes('abstract')
+          );
+          
+          if (injectedConnector && isMetaMaskInstalled) {
+            try {
+              console.log(`Attempting to connect with injected connector: ${injectedConnector.name} (${injectedConnector.id})`);
+              await connect({ connector: injectedConnector });
+              console.log(`Successfully connected with injected connector!`);
+              return;
+            } catch (error) {
+              console.log(`Failed to connect with injected connector:`, error instanceof Error ? error.message : String(error));
             }
           }
           

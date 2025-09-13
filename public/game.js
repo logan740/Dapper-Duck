@@ -22,9 +22,9 @@
   const GLIDE_THRUST = -140;
   const FLAP_COOLDOWN = 0.08;
 
-  // Enhanced bounds
-  const TOP_DEAD_ZONE = 100;
-  const BOTTOM_DEAD_ZONE = 100;
+  // Enhanced bounds - will be calculated dynamically based on screen size
+  let TOP_DEAD_ZONE = 100;
+  let BOTTOM_DEAD_ZONE = 100;
 
   // Enhanced FUD tuning with more aggressive scaling
   const FUD_SIZE = 56;
@@ -137,6 +137,42 @@
   let dpr = Math.max(1, window.devicePixelRatio || 1);
   let scale = 1, offsetX = 0, offsetY = 0;
 
+  function calculateResponsiveDeadZones() {
+    const cssW = window.innerWidth;
+    const cssH = window.innerHeight;
+    
+    // Calculate scale to see how much the virtual canvas is scaled
+    const scale = Math.max(cssW / VIRTUAL_WIDTH, cssH / VIRTUAL_HEIGHT);
+    
+    // Calculate the actual rendered height of the virtual canvas
+    const renderedHeight = VIRTUAL_HEIGHT * scale;
+    
+    // Calculate how much the canvas is offset vertically
+    const offsetY = (cssH - renderedHeight) * 0.5;
+    
+    // Calculate dead zones as a percentage of the actual screen height
+    // This ensures the dead zones are proportional to the screen size
+    const screenDeadZoneRatio = 0.08; // 8% of screen height
+    const screenDeadZone = cssH * screenDeadZoneRatio;
+    
+    // Convert screen dead zone back to virtual canvas coordinates
+    const virtualDeadZone = screenDeadZone / scale;
+    
+    // Ensure minimum dead zone for very small screens
+    TOP_DEAD_ZONE = Math.max(virtualDeadZone, 60);
+    BOTTOM_DEAD_ZONE = Math.max(virtualDeadZone, 60);
+    
+    console.log('Responsive dead zones calculated:', {
+      screenHeight: cssH,
+      renderedHeight: renderedHeight,
+      scale: scale,
+      screenDeadZone: screenDeadZone,
+      virtualDeadZone: virtualDeadZone,
+      topDeadZone: TOP_DEAD_ZONE,
+      bottomDeadZone: BOTTOM_DEAD_ZONE
+    });
+  }
+
   function resize() {
     const cssW = window.innerWidth;
     const cssH = window.innerHeight;
@@ -155,6 +191,9 @@
     ctx.setTransform(dpr * scale, 0, 0, dpr * scale, dpr * offsetX, dpr * offsetY);
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
+    
+    // Recalculate responsive dead zones
+    calculateResponsiveDeadZones();
   }
   window.addEventListener('resize', resize, { passive: true });
   resize();
@@ -1141,6 +1180,9 @@
     
     // Store game type for leaderboard
     window.currentGameType = isPaid ? 'paid' : 'free';
+    
+    // Recalculate responsive dead zones for current screen size
+    calculateResponsiveDeadZones();
     
     // Track game start for Abstract XP
     trackXPEvent('game_start', {

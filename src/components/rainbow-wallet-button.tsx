@@ -73,23 +73,31 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
         onClick={() => {
           console.log('Available connectors:', connectors.map(c => ({ name: c.name, id: c.id })));
           
-          // Try multiple ways to find MetaMask connector
+          // Check if MetaMask is specifically available
+          const isMetaMaskInstalled = typeof window !== 'undefined' && 
+            (window as any).ethereum && 
+            (window as any).ethereum.isMetaMask;
+          
+          console.log('MetaMask installed:', isMetaMaskInstalled);
+          
+          // Try to find MetaMask connector specifically
           let metaMaskConnector = connectors.find(c => 
-            c.name.toLowerCase().includes('metamask')
+            c.name.toLowerCase() === 'metamask' || 
+            c.id.toLowerCase() === 'metamask' ||
+            (c.name.toLowerCase().includes('metamask') && !c.name.toLowerCase().includes('magic'))
           );
           
-          // If not found by name, try by id
-          if (!metaMaskConnector) {
-            metaMaskConnector = connectors.find(c => 
-              c.id.toLowerCase().includes('metamask')
-            );
-          }
-          
-          // If still not found, try 'injected' connector (MetaMask is often the injected connector)
-          if (!metaMaskConnector) {
-            metaMaskConnector = connectors.find(c => 
+          // If MetaMask is installed but connector not found, try injected but verify it's MetaMask
+          if (!metaMaskConnector && isMetaMaskInstalled) {
+            const injectedConnector = connectors.find(c => 
               c.id === 'injected' || c.name.toLowerCase().includes('injected')
             );
+            
+            // Only use injected if we can verify it's MetaMask
+            if (injectedConnector && (window as any).ethereum.isMetaMask) {
+              metaMaskConnector = injectedConnector;
+              console.log('Using injected connector for MetaMask');
+            }
           }
           
           console.log('Found MetaMask connector:', metaMaskConnector);
@@ -97,15 +105,19 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
           if (metaMaskConnector) {
             console.log('Attempting to connect with MetaMask...');
             connect({ connector: metaMaskConnector });
+          } else if (isMetaMaskInstalled) {
+            console.log('MetaMask detected, attempting direct connection...');
+            // Direct connection to MetaMask
+            (window as any).ethereum.request({ method: 'eth_requestAccounts' })
+              .then((accounts: string[]) => {
+                console.log('MetaMask connected:', accounts);
+              })
+              .catch((error: any) => {
+                console.error('MetaMask connection failed:', error);
+              });
           } else {
-            console.error('MetaMask connector not found. Available connectors:', connectors);
-            // Fallback: try to open MetaMask directly
-            if (typeof window !== 'undefined' && (window as any).ethereum) {
-              console.log('MetaMask detected, attempting direct connection...');
-              (window as any).ethereum.request({ method: 'eth_requestAccounts' });
-            } else {
-              alert('MetaMask not found. Please install MetaMask extension.');
-            }
+            console.error('MetaMask not found. Available connectors:', connectors);
+            alert('MetaMask not found. Please install MetaMask extension.');
           }
         }}
         className="cursor-pointer group min-w-32"

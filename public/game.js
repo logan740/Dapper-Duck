@@ -151,7 +151,7 @@
     const offsetY = (cssH - renderedHeight) * 0.5;
     
     // Detect if this is likely a mobile device based on screen size and aspect ratio
-    const isMobile = (cssH > cssW && cssH < 800) || cssH < 600; // Portrait orientation or very small height
+    const isMobile = cssH > cssW || cssH < 800; // Portrait orientation or small height
     const isTablet = cssH >= 800 && cssH < 1200 && cssW < 1200;
     
     // For mobile portrait, we need larger death zones that are visible on screen
@@ -205,7 +205,7 @@
     const cssH = window.innerHeight;
 
     // Detect mobile portrait orientation specifically
-    const isMobile = (cssH > cssW && cssH < 800) || cssH < 600;
+    const isMobile = cssH > cssW || cssH < 800;
     const isPortrait = cssH > cssW;
     
     if (isMobile && isPortrait) {
@@ -1166,8 +1166,8 @@
     
     const cssW = window.innerWidth;
     const cssH = window.innerHeight;
-    // Fix device detection - desktop with height < 800 should be desktop, not mobile
-    const isMobile = (cssH > cssW && cssH < 800) || cssH < 600;
+    // Fix device detection - mobile portrait is height > width
+    const isMobile = cssH > cssW || cssH < 800;
     const isPortrait = cssH > cssW;
     const isTablet = cssH >= 800 && cssH < 1200 && cssW < 1200;
     const isDesktop = !isMobile && !isTablet;

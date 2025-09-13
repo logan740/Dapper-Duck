@@ -167,8 +167,8 @@
       // Small buffer for tablets
       offScreenBuffer = 15; // 15px buffer for tablets
     } else {
-      // Larger buffer for desktop to keep items on screen
-      offScreenBuffer = 50; // 50px buffer for desktop - keeps items visible
+      // Smaller buffer for desktop since we're using fit scaling
+      offScreenBuffer = 30; // 30px buffer for desktop - death zones will be visible
     }
     
     // Convert the off-screen buffer to virtual canvas coordinates
@@ -210,9 +210,12 @@
     if (isMobile && isPortrait) {
       // On mobile portrait, use fit scale to prevent duck cutoff
       scale = Math.min(cssW / VIRTUAL_WIDTH, cssH / VIRTUAL_HEIGHT);
-    } else {
-      // On desktop and mobile landscape, use fill scale for full coverage
+    } else if (isMobile) {
+      // On mobile landscape, use fill scale for full coverage
       scale = Math.max(cssW / VIRTUAL_WIDTH, cssH / VIRTUAL_HEIGHT);
+    } else {
+      // On desktop, use fit scale to keep death zones visible
+      scale = Math.min(cssW / VIRTUAL_WIDTH, cssH / VIRTUAL_HEIGHT);
     }
     
     offsetX = (cssW - VIRTUAL_WIDTH * scale) * 0.5;
@@ -1171,7 +1174,7 @@
     if (isMobile && isPortrait) {
       offScreenBuffer = 60; // Mobile portrait
     } else if (isDesktop) {
-      offScreenBuffer = 50; // Desktop
+      offScreenBuffer = 30; // Desktop
     } else {
       offScreenBuffer = 40; // Mobile landscape
     }

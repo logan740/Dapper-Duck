@@ -22,10 +22,13 @@ interface RainbowWalletButtonProps {
  * - Automatic wallet detection and connection
  */
 export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
-  const { isConnected } = useAccount();
+  const { isConnected, address, status } = useAccount();
   const { connect, connectors } = useConnect();
   const { login } = useLoginWithAbstract();
   const [isConnecting, setIsConnecting] = useState(false);
+
+  // Debug wallet state
+  console.log('RainbowWalletButton - Wallet state:', { isConnected, address, status });
 
   // If connected, show the standard ConnectButton
   if (isConnected) {

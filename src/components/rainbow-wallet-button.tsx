@@ -90,6 +90,19 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
                 method: 'eth_requestAccounts' 
               });
               console.log('MetaMask connected successfully:', accounts);
+              
+              // After direct connection, try to connect via wagmi to update state
+              const metaMaskConnector = connectors.find(c => 
+                c.name.toLowerCase() === 'metamask' || 
+                c.id.toLowerCase() === 'metamask' ||
+                (c.name.toLowerCase().includes('metamask') && !c.name.toLowerCase().includes('magic'))
+              );
+              
+              if (metaMaskConnector) {
+                console.log('Updating wagmi state with MetaMask connector...');
+                await connect({ connector: metaMaskConnector });
+                console.log('Wagmi state updated successfully');
+              }
               return;
             } catch (error) {
               console.error('Direct MetaMask connection failed:', error);

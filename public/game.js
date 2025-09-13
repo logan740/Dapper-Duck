@@ -211,8 +211,11 @@
     if (isMobile && isPortrait) {
       // On mobile portrait, use fit scale to prevent duck cutoff
       scale = Math.min(cssW / VIRTUAL_WIDTH, cssH / VIRTUAL_HEIGHT);
+    } else if (isMobile) {
+      // On mobile landscape, use fill scale for full screen coverage
+      scale = Math.max(cssW / VIRTUAL_WIDTH, cssH / VIRTUAL_HEIGHT);
     } else {
-      // On desktop and mobile landscape, use fill scale for full screen coverage
+      // On desktop, use fill scale for full screen coverage
       scale = Math.max(cssW / VIRTUAL_WIDTH, cssH / VIRTUAL_HEIGHT);
     }
     

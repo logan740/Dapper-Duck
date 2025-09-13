@@ -154,14 +154,14 @@
     const isMobile = cssH > cssW || cssH < 800; // Portrait orientation or small height
     const isTablet = cssH >= 800 && cssH < 1200 && cssW < 1200;
     
-    // For mobile, make death zones very close to screen edges
+    // For mobile, make death zones very close to screen edges with more space
     let offScreenBuffer;
     if (isMobile) {
-      // Minimal buffer for mobile - death zones should be very close to screen edges
-      offScreenBuffer = 10; // 10px buffer for mobile
+      // Very minimal buffer for mobile - death zones should be at screen edges
+      offScreenBuffer = 5; // 5px buffer for mobile - almost at screen edge
     } else if (isTablet) {
       // Small buffer for tablets
-      offScreenBuffer = 20; // 20px buffer for tablets
+      offScreenBuffer = 15; // 15px buffer for tablets
     } else {
       // Standard buffer for desktop
       offScreenBuffer = 40; // 40px buffer for desktop
@@ -195,6 +195,7 @@
     const isMobile = cssH > cssW || cssH < 800;
     if (isMobile) {
       // On mobile, use fill scale to ensure the canvas covers the entire screen
+      // This prevents the duck from being cut off
       scale = Math.max(cssW / VIRTUAL_WIDTH, cssH / VIRTUAL_HEIGHT);
     } else {
       // On desktop, use fit scale to maintain aspect ratio

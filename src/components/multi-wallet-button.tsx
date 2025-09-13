@@ -77,41 +77,44 @@ export function MultiWalletButton({ className, customDropdownItems }: MultiWalle
     )
   }
 
-  // Disconnected state: Show wallet selection
+  // Disconnected state: Show wallet selection buttons
   if (!isConnected) {
     return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            className={cn("cursor-pointer group min-w-40", className)}
-          >
-            Connect Wallet
-            <div className="ml-2 h-4 w-4 group-hover:animate-spin transition-transform" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="center" side="bottom" className="w-56">
-          <div className="px-2 py-1.5 text-sm font-semibold text-muted-foreground">
-            Choose Wallet
-          </div>
-          <DropdownMenuSeparator />
-          {connectors.map((connector) => (
-            <DropdownMenuItem
-              key={connector.uid}
-              onClick={() => connect({ connector })}
-              className="cursor-pointer"
-            >
-              <div className="flex items-center space-x-2">
-                {connector.name.toLowerCase().includes('metamask') ? (
-                  <MetaMaskIcon className="h-4 w-4" />
-                ) : (
-                  <AbstractLogo className="h-4 w-4" />
-                )}
-                <span>{connector.name}</span>
-              </div>
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <div className={cn("flex space-x-2", className)}>
+        {/* Abstract Wallet Button */}
+        <Button
+          onClick={() => {
+            const agwConnector = connectors.find(c => 
+              c.name.toLowerCase().includes('agw') || 
+              c.name.toLowerCase().includes('abstract') ||
+              c.name.toLowerCase().includes('injected')
+            );
+            if (agwConnector) {
+              connect({ connector: agwConnector });
+            }
+          }}
+          className="cursor-pointer group min-w-32"
+        >
+          <AbstractLogo className="mr-2 h-4 w-4 group-hover:animate-spin transition-transform" />
+          Abstract
+        </Button>
+        
+        {/* MetaMask Button */}
+        <Button
+          onClick={() => {
+            const metaMaskConnector = connectors.find(c => 
+              c.name.toLowerCase().includes('metamask')
+            );
+            if (metaMaskConnector) {
+              connect({ connector: metaMaskConnector });
+            }
+          }}
+          className="cursor-pointer group min-w-32"
+        >
+          <MetaMaskIcon className="mr-2 h-4 w-4 group-hover:animate-spin transition-transform" />
+          MetaMask
+        </Button>
+      </div>
     )
   }
 

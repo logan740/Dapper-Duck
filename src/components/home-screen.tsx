@@ -1342,18 +1342,18 @@ export function HomeScreen() {
     ];
 
     return (
-      <div className="space-y-8">
+      <div className="space-y-4 sm:space-y-6 md:space-y-8">
         <div className="text-center">
-          <h2 className="text-4xl font-bold text-white mb-4">👤 Profile</h2>
-          <p className="text-xl text-gray-300">Customize your profile and view your gaming statistics</p>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 sm:mb-4">👤 Profile</h2>
+          <p className="text-sm sm:text-lg md:text-xl text-gray-300">Customize your profile and view your gaming statistics</p>
         </div>
         
         {/* Profile Header */}
-        <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-8 border border-white/10">
-          <div className="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-8">
+        <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-4 sm:p-6 md:p-8 border border-white/10">
+          <div className="flex flex-col md:flex-row items-center md:items-start space-y-4 sm:space-y-6 md:space-y-0 md:space-x-8">
             {/* Profile Picture */}
             <div className="relative group">
-              <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white/20 bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center">
+              <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-white/20 bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center">
                 {profilePicture ? (
                   <img 
                     src={profilePicture} 
@@ -1369,7 +1369,7 @@ export function HomeScreen() {
                     }}
                   />
                 ) : (
-                  <span className="text-6xl">🦆</span>
+                  <span className="text-3xl sm:text-4xl md:text-6xl">🦆</span>
                 )}
               </div>
               {isEditingProfile && (
@@ -1415,7 +1415,7 @@ export function HomeScreen() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <h3 className="text-3xl font-bold text-white">
+                  <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-white">
                     {(() => {
                       console.log('Displaying profile name - profileName:', profileName, 'profileData.name:', profileData.name);
                       if (isConnected && address) {
@@ -1425,7 +1425,7 @@ export function HomeScreen() {
                       }
                     })()}
                   </h3>
-                  <p className="text-gray-300">
+                  <p className="text-sm sm:text-base text-gray-300">
                     {gameStats.gamesPlayed > 0 ? 'Experienced Player' : 'New Player'}
                   </p>
                   
@@ -1470,18 +1470,18 @@ export function HomeScreen() {
                     )}
                   </div>
                   
-                  <div className="flex justify-center md:justify-start space-x-4">
+                  <div className="flex flex-col sm:flex-row justify-center md:justify-start gap-2 sm:gap-4">
                     {isConnected && address ? (
                       <Button 
                         onClick={() => setIsEditingProfile(true)}
                         variant="outline"
-                        className="border-white/50 text-white bg-white/10 hover:bg-white/20 hover:border-white/70"
+                        className="border-white/50 text-white bg-white/10 hover:bg-white/20 hover:border-white/70 text-sm sm:text-base"
                       >
-                        <Edit className="w-4 h-4 mr-2" />
+                        <Edit className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                         Edit Profile
                       </Button>
                     ) : (
-                      <div className="text-sm text-gray-400 bg-white/5 px-4 py-2 rounded-lg border border-white/10">
+                      <div className="text-xs sm:text-sm text-gray-400 bg-white/5 px-3 sm:px-4 py-2 rounded-lg border border-white/10 text-center">
                         Connect wallet to edit profile
                       </div>
                     )}
@@ -1492,12 +1492,14 @@ export function HomeScreen() {
                         setStatsRefresh(prev => prev + 1);
                       }}
                       variant="outline"
-                      className="border-blue-500/50 text-blue-400 bg-blue-500/10 hover:bg-blue-500/20 hover:border-blue-500/70"
+                      className="border-blue-500/50 text-blue-400 bg-blue-500/10 hover:bg-blue-500/20 hover:border-blue-500/70 text-sm sm:text-base"
                     >
-                      <User className="w-4 h-4 mr-2" />
+                      <User className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                       Refresh Profile
                     </Button>
-                    <RainbowWalletButton />
+                    <div className="scale-90 sm:scale-100">
+                      <RainbowWalletButton />
+                    </div>
                   </div>
                 </div>
               )}
@@ -1508,8 +1510,8 @@ export function HomeScreen() {
 
         {/* Social Links Section */}
         {isEditingProfile && (
-          <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-8 border border-white/10">
-            <h3 className="text-2xl font-bold text-white mb-6">Social Links</h3>
+          <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-4 sm:p-6 md:p-8 border border-white/10">
+            <h3 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Social Links</h3>
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">X (Twitter)</label>

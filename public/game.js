@@ -167,8 +167,8 @@
       // Small buffer for tablets
       offScreenBuffer = 15; // 15px buffer for tablets
     } else {
-      // For desktop, use a large buffer to make death zones visible ON-SCREEN
-      offScreenBuffer = 80; // 80px buffer for desktop - death zones visible on screen
+      // For desktop with fill scaling, use a much smaller buffer to keep death zones on-screen
+      offScreenBuffer = 20; // 20px buffer for desktop - death zones on-screen with fill scaling
     }
     
     // Convert the off-screen buffer to virtual canvas coordinates
@@ -211,12 +211,9 @@
     if (isMobile && isPortrait) {
       // On mobile portrait, use fit scale to prevent duck cutoff
       scale = Math.min(cssW / VIRTUAL_WIDTH, cssH / VIRTUAL_HEIGHT);
-    } else if (isMobile) {
-      // On mobile landscape, use fill scale for full screen coverage
-      scale = Math.max(cssW / VIRTUAL_WIDTH, cssH / VIRTUAL_HEIGHT);
     } else {
-      // On desktop, use fit scale to prevent stretching and keep proper aspect ratio
-      scale = Math.min(cssW / VIRTUAL_WIDTH, cssH / VIRTUAL_HEIGHT);
+      // On desktop and mobile landscape, use fill scale for full screen coverage
+      scale = Math.max(cssW / VIRTUAL_WIDTH, cssH / VIRTUAL_HEIGHT);
     }
     
     offsetX = (cssW - VIRTUAL_WIDTH * scale) * 0.5;
@@ -1187,7 +1184,7 @@
     if (isMobile && isPortrait) {
       offScreenBuffer = 60; // Mobile portrait
     } else if (isDesktop) {
-      offScreenBuffer = 80; // Desktop - same as death zone buffer
+      offScreenBuffer = 20; // Desktop - same as death zone buffer
     } else {
       offScreenBuffer = 60; // Default for all other devices
     }

@@ -89,12 +89,7 @@ export default function GamePage() {
         className="absolute inset-0 w-full h-full touch-none select-none" 
         style={{ 
           touchAction: 'none', 
-          userSelect: 'none',
-          width: '100vw',
-          height: '100vh',
-          position: 'absolute',
-          top: 0,
-          left: 0
+          userSelect: 'none'
         }}
       />
 

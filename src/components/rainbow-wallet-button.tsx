@@ -82,41 +82,14 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
           console.log('MetaMask installed:', isMetaMaskInstalled);
           console.log('window.ethereum:', (window as any).ethereum);
           
-          // Try direct MetaMask connection first (most reliable)
-          if (isMetaMaskInstalled) {
-            try {
-              console.log('Attempting direct MetaMask connection...');
-              const accounts = await (window as any).ethereum.request({ 
-                method: 'eth_requestAccounts' 
-              });
-              console.log('MetaMask connected successfully:', accounts);
-              
-              // After direct connection, try to connect via wagmi to update state
-              const metaMaskConnector = connectors.find(c => 
-                c.name.toLowerCase() === 'metamask' || 
-                c.id.toLowerCase() === 'metamask' ||
-                (c.name.toLowerCase().includes('metamask') && !c.name.toLowerCase().includes('magic'))
-              );
-              
-              if (metaMaskConnector) {
-                console.log('Updating wagmi state with MetaMask connector...');
-                await connect({ connector: metaMaskConnector });
-                console.log('Wagmi state updated successfully');
-              }
-              return;
-            } catch (error) {
-              console.error('Direct MetaMask connection failed:', error);
-            }
-          }
-          
-          // Fallback to RainbowKit connector
+          // Find MetaMask connector first
           let metaMaskConnector = connectors.find(c => 
             c.name.toLowerCase() === 'metamask' || 
             c.id.toLowerCase() === 'metamask' ||
             (c.name.toLowerCase().includes('metamask') && !c.name.toLowerCase().includes('magic'))
           );
           
-          // If still not found, try injected connector
+          // If not found, try injected connector
           if (!metaMaskConnector) {
             metaMaskConnector = connectors.find(c => 
               c.id === 'injected' || c.name.toLowerCase().includes('injected')
@@ -126,30 +99,40 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
           
           console.log('Found MetaMask connector:', metaMaskConnector);
           
+          // Use wagmi connection (this will properly open MetaMask and request signatures)
           if (metaMaskConnector) {
             try {
-              console.log('Attempting to connect with RainbowKit connector...');
+              console.log('Attempting to connect with wagmi MetaMask connector...');
               await connect({ connector: metaMaskConnector });
-              console.log('RainbowKit connection successful');
+              console.log('Wagmi MetaMask connection successful');
+              return;
             } catch (error) {
-              console.error('RainbowKit connection failed:', error);
-              // Try direct connection as last resort
-              if (isMetaMaskInstalled) {
-                try {
-                  await (window as any).ethereum.request({ method: 'eth_requestAccounts' });
-                  console.log('Fallback direct connection successful');
-                } catch (fallbackError) {
-                  console.error('Fallback connection also failed:', fallbackError);
-                }
-              }
+              console.error('Wagmi MetaMask connection failed:', error);
             }
+          }
+          
+          // Fallback to direct connection only if wagmi fails
+          if (isMetaMaskInstalled) {
+            try {
+              console.log('Attempting direct MetaMask connection as fallback...');
+              const accounts = await (window as any).ethereum.request({ 
+                method: 'eth_requestAccounts' 
+              });
+              console.log('Direct MetaMask connection successful:', accounts);
+              // Note: This won't update the UI state properly
+              alert('MetaMask connected but UI may not update. Please refresh the page.');
+              return;
+            } catch (error) {
+              console.error('Direct MetaMask connection failed:', error);
+            }
+          }
+          
+          // If we get here, no connection method worked
+          console.error('No MetaMask connector found');
+          if (isMetaMaskInstalled) {
+            alert('MetaMask is installed but not detected by RainbowKit. Please try refreshing the page.');
           } else {
-            console.error('No MetaMask connector found');
-            if (isMetaMaskInstalled) {
-              alert('MetaMask is installed but not detected by RainbowKit. Please try refreshing the page.');
-            } else {
-              alert('MetaMask not found. Please install MetaMask extension.');
-            }
+            alert('MetaMask not found. Please install MetaMask extension.');
           }
         }}
         className="cursor-pointer group min-w-32"

@@ -71,14 +71,41 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
       {/* MetaMask Button */}
       <Button
         onClick={() => {
-          // Use MetaMask connector directly
-          const metaMaskConnector = connectors.find(c => 
+          console.log('Available connectors:', connectors.map(c => ({ name: c.name, id: c.id })));
+          
+          // Try multiple ways to find MetaMask connector
+          let metaMaskConnector = connectors.find(c => 
             c.name.toLowerCase().includes('metamask')
           );
+          
+          // If not found by name, try by id
+          if (!metaMaskConnector) {
+            metaMaskConnector = connectors.find(c => 
+              c.id.toLowerCase().includes('metamask')
+            );
+          }
+          
+          // If still not found, try 'injected' connector (MetaMask is often the injected connector)
+          if (!metaMaskConnector) {
+            metaMaskConnector = connectors.find(c => 
+              c.id === 'injected' || c.name.toLowerCase().includes('injected')
+            );
+          }
+          
+          console.log('Found MetaMask connector:', metaMaskConnector);
+          
           if (metaMaskConnector) {
+            console.log('Attempting to connect with MetaMask...');
             connect({ connector: metaMaskConnector });
           } else {
-            console.error('MetaMask connector not found');
+            console.error('MetaMask connector not found. Available connectors:', connectors);
+            // Fallback: try to open MetaMask directly
+            if (typeof window !== 'undefined' && (window as any).ethereum) {
+              console.log('MetaMask detected, attempting direct connection...');
+              (window as any).ethereum.request({ method: 'eth_requestAccounts' });
+            } else {
+              alert('MetaMask not found. Please install MetaMask extension.');
+            }
           }
         }}
         className="cursor-pointer group min-w-32"

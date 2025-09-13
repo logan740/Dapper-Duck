@@ -157,7 +157,7 @@
     // Different dead zone ratios for different device types
     let screenDeadZoneRatio;
     if (isMobile) {
-      screenDeadZoneRatio = 0.25; // 25% of screen height - much looser for mobile
+      screenDeadZoneRatio = 0.35; // 35% of screen height - very loose for mobile
     } else if (isTablet) {
       screenDeadZoneRatio = 0.12; // 12% of screen height - medium for tablets
     } else {
@@ -172,8 +172,8 @@
     // Set minimum and maximum dead zones based on device type
     let minDeadZone, maxDeadZone;
     if (isMobile) {
-      minDeadZone = 120; // Minimum 120px on mobile - much more forgiving
-      maxDeadZone = 200; // Maximum 200px on mobile - allows going off screen
+      minDeadZone = 150; // Minimum 150px on mobile - very forgiving
+      maxDeadZone = 250; // Maximum 250px on mobile - definitely allows going off screen
     } else if (isTablet) {
       minDeadZone = 70;  // Minimum 70px on tablet
       maxDeadZone = 120; // Maximum 120px on tablet

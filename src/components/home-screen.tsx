@@ -828,12 +828,16 @@ export function HomeScreen() {
     const leaderboardData: LeaderboardEntry[] = isClient ? (() => {
       try {
         const saved = localStorage.getItem('dapperDuck_leaderboard');
+        console.log('Raw leaderboard data from localStorage:', saved);
         if (saved) {
           const data = JSON.parse(saved);
-          console.log('Loaded leaderboard data:', data);
+          console.log('Parsed leaderboard data:', data);
+          console.log('Leaderboard length:', data.length);
           console.log('First entry profile picture:', data[0]?.profilePicture);
           console.log('First entry name:', data[0]?.name);
           return data;
+        } else {
+          console.log('No leaderboard data found in localStorage');
         }
       } catch (error) {
         console.log('Error loading leaderboard:', error);

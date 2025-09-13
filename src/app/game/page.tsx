@@ -11,6 +11,15 @@ export default function GamePage() {
 
   // Ensure full-viewport sizing for canvas and mobile optimization
   useEffect(() => {
+    // Set full viewport height for mobile
+    const setViewportHeight = () => {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+    };
+    
+    setViewportHeight();
+    window.addEventListener('resize', setViewportHeight);
+    
     document.documentElement.style.height = "100%";
     document.body.style.height = "100%";
     document.body.style.margin = "0";
@@ -40,6 +49,7 @@ export default function GamePage() {
     document.addEventListener('touchend', preventDefault, { passive: false });
     
     return () => {
+      window.removeEventListener('resize', setViewportHeight);
       document.removeEventListener('touchstart', preventDefault);
       document.removeEventListener('touchmove', preventDefault);
       document.removeEventListener('touchend', preventDefault);
@@ -72,7 +82,7 @@ export default function GamePage() {
   }, [address]);
 
   return (
-    <div className="relative w-screen h-[100svh] overflow-hidden touch-none select-none">
+    <div className="relative w-screen overflow-hidden touch-none select-none" style={{ height: 'calc(var(--vh, 1vh) * 100)' }}>
       {/* Game Canvas */}
       <canvas 
         id="game" 

@@ -154,16 +154,16 @@
     const isMobile = cssH > cssW || cssH < 800; // Portrait orientation or small height
     const isTablet = cssH >= 800 && cssH < 1200 && cssW < 1200;
     
-    // Mobile-optimized boundary calculation
+    // For mobile, make death zones very close to screen edges
     let offScreenBuffer;
     if (isMobile) {
-      // More generous boundaries for mobile - allow duck to go further off screen
-      offScreenBuffer = 80; // 80px buffer for mobile
+      // Minimal buffer for mobile - death zones should be very close to screen edges
+      offScreenBuffer = 10; // 10px buffer for mobile
     } else if (isTablet) {
-      // Medium boundaries for tablets
-      offScreenBuffer = 60; // 60px buffer for tablets
+      // Small buffer for tablets
+      offScreenBuffer = 20; // 20px buffer for tablets
     } else {
-      // Tighter boundaries for desktop
+      // Standard buffer for desktop
       offScreenBuffer = 40; // 40px buffer for desktop
     }
     
@@ -191,12 +191,25 @@
     const cssW = window.innerWidth;
     const cssH = window.innerHeight;
 
-    scale = Math.max(cssW / VIRTUAL_WIDTH, cssH / VIRTUAL_HEIGHT);
+    // Use fill scale for mobile to ensure canvas fills the screen
+    const isMobile = cssH > cssW || cssH < 800;
+    if (isMobile) {
+      // On mobile, use fill scale to ensure the canvas covers the entire screen
+      scale = Math.max(cssW / VIRTUAL_WIDTH, cssH / VIRTUAL_HEIGHT);
+    } else {
+      // On desktop, use fit scale to maintain aspect ratio
+      scale = Math.min(cssW / VIRTUAL_WIDTH, cssH / VIRTUAL_HEIGHT);
+    }
+    
     offsetX = (cssW - VIRTUAL_WIDTH * scale) * 0.5;
     offsetY = (cssH - VIRTUAL_HEIGHT * scale) * 0.5;
 
+    // Ensure canvas fills the full viewport
     canvas.style.width = cssW + 'px';
     canvas.style.height = cssH + 'px';
+    canvas.style.position = 'absolute';
+    canvas.style.top = '0';
+    canvas.style.left = '0';
 
     dpr = Math.max(1, window.devicePixelRatio || 1);
     canvas.width = Math.round(cssW * dpr);

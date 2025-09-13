@@ -158,7 +158,7 @@
     let offScreenBuffer;
     if (isMobile) {
       // Small buffer for mobile - death zones should be close to screen edges
-      offScreenBuffer = 10; // 10px buffer for mobile
+      offScreenBuffer = 5; // 5px buffer for mobile
     } else if (isTablet) {
       // Small buffer for tablets
       offScreenBuffer = 15; // 15px buffer for tablets
@@ -199,8 +199,8 @@
       scale = Math.min(cssW / VIRTUAL_WIDTH, cssH / VIRTUAL_HEIGHT);
       console.log('Mobile scaling:', { cssW, cssH, scale, offsetX: (cssW - VIRTUAL_WIDTH * scale) * 0.5 });
     } else {
-      // On desktop, use fit scale to maintain aspect ratio
-      scale = Math.min(cssW / VIRTUAL_WIDTH, cssH / VIRTUAL_HEIGHT);
+      // On desktop, use fill scale to avoid black bars and fill the screen
+      scale = Math.max(cssW / VIRTUAL_WIDTH, cssH / VIRTUAL_HEIGHT);
     }
     
     offsetX = (cssW - VIRTUAL_WIDTH * scale) * 0.5;

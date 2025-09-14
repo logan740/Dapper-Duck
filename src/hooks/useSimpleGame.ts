@@ -67,6 +67,11 @@ export function useSimpleGame() {
         console.log(`Game started: Player ${player}, Game ID ${gameId}, Time ${timestamp}`);
         setCurrentGameId(Number(gameId));
         setIsGameActive(true);
+        
+        // Trigger the game start in game.js
+        if (typeof window !== 'undefined' && (window as any).startPaidGame) {
+          (window as any).startPaidGame(Number(gameId));
+        }
       });
     },
   });

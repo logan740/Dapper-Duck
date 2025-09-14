@@ -45,9 +45,8 @@ export function PayToPlayButton({
 
     try {
       await startGame();
-      if (onGameStarted && currentGameId) {
-        onGameStarted(currentGameId);
-      }
+      // Note: The game will be started via the contract event listener
+      // when the transaction is confirmed
     } catch (error) {
       console.error('Failed to start game:', error);
     }
@@ -61,7 +60,15 @@ export function PayToPlayButton({
     }
 
     try {
-      await endGame(gameScore);
+      // For testing, just end the game locally without calling the contract
+      // The contract will be called automatically when the game actually ends
+      console.log('Ending game locally for testing. Score:', gameScore);
+      
+      // Show the menu again
+      if (typeof window !== 'undefined' && (window as any).showMenu) {
+        (window as any).showMenu();
+      }
+      
       if (onGameEnded) {
         onGameEnded(gameScore);
       }
@@ -135,7 +142,7 @@ export function PayToPlayButton({
               disabled={isEndingGame}
               className="bg-red-600 hover:bg-red-700 text-white px-4 py-2"
             >
-              {isEndingGame ? 'Ending...' : 'End Game'}
+              {isEndingGame ? 'Ending...' : 'End Game (Test)'}
             </Button>
           </div>
         </div>

@@ -1629,6 +1629,18 @@
     window.endPaidGameContract = endGameFunction;
   };
 
+  // Function to show the menu (called from React component)
+  window.showMenu = function() {
+    console.log('Showing menu');
+    setState(State.MENU);
+    
+    // Show the menu element
+    const menu = document.getElementById('menu');
+    if (menu) {
+      menu.style.display = 'block';
+    }
+  };
+
   // Modify the game over logic to handle paid games
   const originalGameOver = gameOver;
   gameOver = function(reason) {

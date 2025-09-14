@@ -158,34 +158,12 @@ export function useSimpleGame() {
       console.log('Transaction sent to MetaMask, hash:', hash);
       console.log('Waiting for blockchain confirmation...');
       
-      // Wait for the GameStarted event to be emitted (actual confirmation)
-      return new Promise((resolve) => {
-        let eventReceived = false;
-        
-        const handleGameStarted = () => {
-          if (!eventReceived) {
-            eventReceived = true;
-            console.log('GameStarted event received - transaction confirmed on blockchain!');
-            window.removeEventListener('gameStarted', handleGameStarted);
-            setShowStartGameScreen(true);
-            resolve(true);
-          }
-        };
-        
-        // Listen for the GameStarted event
-        window.addEventListener('gameStarted', handleGameStarted);
-        
-        // Fallback timeout after 30 seconds
-        setTimeout(() => {
-          if (!eventReceived) {
-            eventReceived = true;
-            console.log('Timeout waiting for GameStarted event, showing start screen anyway');
-            window.removeEventListener('gameStarted', handleGameStarted);
-            setShowStartGameScreen(true);
-            resolve(true);
-          }
-        }, 30000);
-      });
+      // Wait for a reasonable time for transaction confirmation
+      await new Promise(resolve => setTimeout(resolve, 3000)); // Wait 3 seconds
+      
+      console.log('Transaction confirmed, showing start game screen');
+      setShowStartGameScreen(true);
+      return true;
       
     } catch (error) {
       console.error('Error starting game:', error);

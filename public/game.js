@@ -1626,8 +1626,8 @@
     currentPaidGameId = gameId;
     isPaidGame = true;
     
-    // Start the paid game and ensure leaderboard marks it as paid
-    startGame(true);
+    // Start the game
+    setState(State.PLAY);
     
     // Hide the menu
     const menu = document.getElementById('menu');

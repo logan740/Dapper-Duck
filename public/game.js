@@ -150,9 +150,10 @@
     // Calculate how much the canvas is offset vertically
     const offsetY = (cssH - renderedHeight) * 0.5;
     
-    // Detect if this is likely a mobile device based on screen size and aspect ratio
-    const isMobile = cssH > cssW || cssH < 800; // Portrait orientation or small height
-    const isTablet = cssH >= 800 && cssH < 1200 && cssW < 1200;
+    // Detect device type using user agent and screen size
+    const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isMobile = isMobileDevice || (cssH > cssW && cssH < 800); // Mobile device or small portrait
+    const isTablet = !isMobileDevice && cssH >= 800 && cssH < 1200 && cssW < 1200;
     
     // For mobile portrait, we need larger death zones that are visible on screen
     const isPortrait = cssH > cssW;
@@ -182,8 +183,8 @@
       TOP_DEAD_ZONE = innerDeadZone;
       BOTTOM_DEAD_ZONE = innerDeadZone;
     } else if (!isMobile && !isTablet) {
-      // Desktop: Use larger death zones for better gameplay
-      const desktopDeadZone = Math.max(80, virtualDeadZone + 40);
+      // Desktop: Use very large death zones to prevent going off screen
+      const desktopDeadZone = Math.max(200, virtualDeadZone + 150);
       TOP_DEAD_ZONE = desktopDeadZone;
       BOTTOM_DEAD_ZONE = desktopDeadZone;
     } else {
@@ -194,6 +195,7 @@
     
     console.log('Device-optimized dead zones calculated:', {
       deviceType: isMobile ? 'mobile' : isTablet ? 'tablet' : 'desktop',
+      isMobileDevice: isMobileDevice,
       screenWidth: cssW,
       screenHeight: cssH,
       renderedHeight: renderedHeight,
@@ -203,7 +205,8 @@
       topDeadZone: TOP_DEAD_ZONE,
       bottomDeadZone: BOTTOM_DEAD_ZONE,
       isPortrait: isPortrait,
-      desktopOptimized: !isMobile && !isTablet
+      desktopOptimized: !isMobile && !isTablet,
+      virtualHeight: VIRTUAL_HEIGHT
     });
   }
 

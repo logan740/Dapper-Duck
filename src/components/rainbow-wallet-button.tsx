@@ -70,54 +70,11 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
       
       {/* MetaMask Button */}
       <Button
-        onClick={async () => {
+        onClick={() => {
           console.log('🔥 META MASK BUTTON CLICKED 🔥');
           console.log('🔥 META MASK BUTTON CLICKED 🔥');
           console.log('🔥 META MASK BUTTON CLICKED 🔥');
-          
-          if (typeof window !== 'undefined' && (window as any).ethereum) {
-            console.log('MetaMask detected, attempting connection...');
-            
-            try {
-              // First, connect directly to MetaMask
-              const accounts = await (window as any).ethereum.request({ 
-                method: 'eth_requestAccounts' 
-              });
-              console.log('MetaMask connected:', accounts);
-              
-              // Now find the MetaMask connector in wagmi and connect through it
-              console.log('Available connectors:', connectors.map(c => ({ name: c.name, id: c.id })));
-              
-              // Find MetaMask connector (exclude abstract, privy, magic)
-              const metaMaskConnector = connectors.find(connector => 
-                connector.name.toLowerCase().includes('metamask') ||
-                connector.id.toLowerCase().includes('metamask') ||
-                (connector.name.toLowerCase().includes('injected') && 
-                 !connector.name.toLowerCase().includes('abstract') &&
-                 !connector.name.toLowerCase().includes('privy') &&
-                 !connector.name.toLowerCase().includes('magic'))
-              );
-              
-              console.log('Found MetaMask connector:', metaMaskConnector?.name, metaMaskConnector?.id);
-              
-              if (metaMaskConnector) {
-                console.log('Connecting through wagmi...');
-                await connect({ connector: metaMaskConnector });
-                console.log('Successfully connected through wagmi!');
-                alert('MetaMask connected and UI updated!');
-              } else {
-                console.log('No MetaMask connector found, refreshing page...');
-                window.location.reload();
-              }
-              
-            } catch (error) {
-              console.error('MetaMask connection failed:', error);
-              alert('MetaMask connection failed: ' + (error as Error).message);
-            }
-          } else {
-            console.log('MetaMask not detected');
-            alert('MetaMask not detected');
-          }
+          alert('MetaMask button clicked - check console!');
         }}
         onMouseDown={() => {
           console.log('🖱️ META MASK BUTTON MOUSE DOWN 🖱️');

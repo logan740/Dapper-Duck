@@ -183,8 +183,8 @@
       TOP_DEAD_ZONE = innerDeadZone;
       BOTTOM_DEAD_ZONE = innerDeadZone;
     } else if (!isMobile && !isTablet) {
-      // Desktop: Use smaller death zones for larger play area
-      const desktopDeadZone = Math.max(40, virtualDeadZone - 20);
+      // Desktop: Use smaller death zones for larger play area - UPDATED
+      const desktopDeadZone = Math.max(30, virtualDeadZone - 30);
       TOP_DEAD_ZONE = desktopDeadZone;
       BOTTOM_DEAD_ZONE = desktopDeadZone;
     } else {

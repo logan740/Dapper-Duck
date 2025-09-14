@@ -183,8 +183,8 @@
       TOP_DEAD_ZONE = innerDeadZone;
       BOTTOM_DEAD_ZONE = innerDeadZone;
     } else if (!isMobile && !isTablet) {
-      // Desktop: Use smaller death zones for larger play area - UPDATED
-      const desktopDeadZone = Math.max(60, virtualDeadZone - 60);
+      // Desktop: Use much larger death zones to prevent off-screen falling
+      const desktopDeadZone = Math.max(120, virtualDeadZone - 20);
       TOP_DEAD_ZONE = desktopDeadZone;
       BOTTOM_DEAD_ZONE = desktopDeadZone;
     } else {
@@ -1199,7 +1199,7 @@
     if (isMobile && isPortrait) {
       offScreenBuffer = 60; // Mobile portrait
     } else if (isDesktop) {
-      offScreenBuffer = 60; // Desktop - same as mobile for consistent visual danger zones
+      offScreenBuffer = 140; // Desktop - larger visual danger zones
     } else {
       offScreenBuffer = 60; // Default for all other devices
     }

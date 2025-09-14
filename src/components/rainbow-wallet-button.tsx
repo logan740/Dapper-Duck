@@ -71,20 +71,36 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
       {/* MetaMask Button */}
       <Button
         onClick={async () => {
-          console.log('=== MetaMask Button Clicked ===');
-          alert('MetaMask button clicked! Check console for details.');
-          
-          // Check if MetaMask is available
-          const isMetaMaskInstalled = typeof window !== 'undefined' && 
-            (window as any).ethereum && 
-            (window as any).ethereum.isMetaMask;
-          
-          console.log('MetaMask installed:', isMetaMaskInstalled);
-          console.log('window.ethereum:', (window as any).ethereum);
-          
-          if (!isMetaMaskInstalled) {
-            alert('MetaMask not found. Please install MetaMask extension.');
-            return;
+          try {
+            console.log('=== MetaMask Button Clicked ===');
+            alert('MetaMask button clicked! Check console for details.');
+            
+            console.log('Step 1: Checking window object...');
+            console.log('typeof window:', typeof window);
+            console.log('window exists:', !!window);
+            
+            console.log('Step 2: Checking ethereum object...');
+            console.log('window.ethereum exists:', !!(window as any).ethereum);
+            console.log('window.ethereum:', (window as any).ethereum);
+            
+            // Check if MetaMask is available
+            const isMetaMaskInstalled = typeof window !== 'undefined' && 
+              (window as any).ethereum && 
+              (window as any).ethereum.isMetaMask;
+            
+            console.log('Step 3: MetaMask detection...');
+            console.log('MetaMask installed:', isMetaMaskInstalled);
+            
+            if (!isMetaMaskInstalled) {
+              console.log('Step 4: MetaMask not found, showing alert...');
+              alert('MetaMask not found. Please install MetaMask extension.');
+              return;
+            }
+            
+            console.log('Step 5: MetaMask found, proceeding with connection...');
+          } catch (error) {
+            console.error('Error in MetaMask button click:', error);
+            alert('Error occurred: ' + (error instanceof Error ? error.message : String(error)));
           }
           
           try {

@@ -70,16 +70,22 @@ export function useSimpleGame() {
     },
   });
 
-  // Wait for transaction receipt
+  // Wait for transaction receipt with multiple confirmations
   const { data: receipt, isSuccess: isTransactionSuccess } = useWaitForTransactionReceipt({
     hash: transactionHash as `0x${string}` | undefined,
+    confirmations: 2, // Wait for 2 confirmations for more security
   });
 
   // Watch for transaction success
   useEffect(() => {
     if (isTransactionSuccess && receipt && transactionHash) {
       console.log('Transaction confirmed on blockchain!', receipt);
-      setShowStartGameScreen(true);
+      
+      // Add small delay to ensure transaction is fully confirmed
+      setTimeout(() => {
+        console.log('Transaction fully confirmed, showing start game screen');
+        setShowStartGameScreen(true);
+      }, 2000); // Wait 2 more seconds for full confirmation
     }
   }, [isTransactionSuccess, receipt, transactionHash]);
 

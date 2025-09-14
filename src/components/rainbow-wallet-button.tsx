@@ -97,7 +97,7 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
             try {
               await (window as any).ethereum.request({
                 method: 'wallet_switchEthereumChain',
-                params: [{ chainId: '0x1A4' }], // Abstract testnet chain ID
+                params: [{ chainId: '0x2B7C' }], // Abstract testnet chain ID (11124 in hex)
               });
               console.log('Switched to Abstract testnet');
             } catch (switchError) {
@@ -107,7 +107,7 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
                 await (window as any).ethereum.request({
                   method: 'wallet_addEthereumChain',
                   params: [{
-                    chainId: '0x1A4',
+                    chainId: '0x2B7C', // 11124 in hex
                     chainName: 'Abstract Testnet',
                     nativeCurrency: {
                       name: 'Ether',
@@ -115,7 +115,7 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
                       decimals: 18,
                     },
                     rpcUrls: ['https://api.testnet.abs.xyz'],
-                    blockExplorerUrls: ['https://testnet.abs.xyz'],
+                    blockExplorerUrls: ['https://sepolia.abscan.org/'],
                   }],
                 });
                 console.log('Added Abstract testnet');

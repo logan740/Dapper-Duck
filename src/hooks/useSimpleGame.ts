@@ -1,4 +1,4 @@
-import { useReadContract, useWriteContract, useWatchContractEvent, useSendTransaction } from 'wagmi';
+import { useReadContract, useWriteContract, useWatchContractEvent, useSendTransaction, useWaitForTransactionReceipt } from 'wagmi';
 import { parseEther, encodeFunctionData } from 'viem';
 import { SIMPLE_GAME_CONTRACT } from '@/config/contract-config';
 import { useState, useEffect } from 'react';
@@ -11,6 +11,7 @@ export function useSimpleGame() {
   const [isGameActive, setIsGameActive] = useState(false);
   const [isTransactionConfirmed, setIsTransactionConfirmed] = useState(false);
   const [showStartGameScreen, setShowStartGameScreen] = useState(false);
+  const [transactionHash, setTransactionHash] = useState<string | null>(null);
 
   // Reset state when component mounts (in case of page refresh)
   useEffect(() => {
@@ -19,6 +20,7 @@ export function useSimpleGame() {
     setIsGameActive(false);
     setIsTransactionConfirmed(false);
     setShowStartGameScreen(false);
+    setTransactionHash(null);
   }, []);
 
   // Contract reads
@@ -59,6 +61,7 @@ export function useSimpleGame() {
     mutation: {
       onSuccess: (hash) => {
         console.log('Transaction sent successfully:', hash);
+        setTransactionHash(hash);
         // Don't set game active here - wait for confirmation
       },
       onError: (error) => {
@@ -66,6 +69,19 @@ export function useSimpleGame() {
       },
     },
   });
+
+  // Wait for transaction receipt
+  const { data: receipt, isSuccess: isTransactionSuccess } = useWaitForTransactionReceipt({
+    hash: transactionHash as `0x${string}` | undefined,
+  });
+
+  // Watch for transaction success
+  useEffect(() => {
+    if (isTransactionSuccess && receipt && transactionHash) {
+      console.log('Transaction confirmed on blockchain!', receipt);
+      setShowStartGameScreen(true);
+    }
+  }, [isTransactionSuccess, receipt, transactionHash]);
 
   const { writeContract: endWriteContract, isPending: isEndingGame, error: endGameError } = useWriteContract({
     mutation: {
@@ -149,20 +165,15 @@ export function useSimpleGame() {
       });
       
       // Send the transaction
-      const hash = await sendTransaction({
+      sendTransaction({
         to: SIMPLE_GAME_CONTRACT.address,
         value: parseEther(SIMPLE_GAME_CONTRACT.gameFee),
         data: data,
       });
       
-      console.log('Transaction sent to MetaMask, hash:', hash);
-      console.log('Waiting for blockchain confirmation...');
+      console.log('Transaction sent to MetaMask, waiting for confirmation...');
       
-      // Wait for a reasonable time for transaction confirmation
-      await new Promise(resolve => setTimeout(resolve, 3000)); // Wait 3 seconds
-      
-      console.log('Transaction confirmed, showing start game screen');
-      setShowStartGameScreen(true);
+      // Return true immediately - the useEffect will handle showing the start screen
       return true;
       
     } catch (error) {

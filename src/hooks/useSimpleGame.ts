@@ -80,6 +80,9 @@ export function useSimpleGame() {
         
         // Don't automatically start the game - let the user control when to start
         console.log('Game transaction confirmed! Ready to start when user is ready.');
+        
+        // Dispatch custom event for startGame function to listen to
+        window.dispatchEvent(new CustomEvent('gameStarted'));
       });
     },
   });
@@ -123,16 +126,48 @@ export function useSimpleGame() {
         return false;
       }
       
-      // Call the contract
-      await writeContract({
-        address: SIMPLE_GAME_CONTRACT.address,
-        abi: SIMPLE_GAME_CONTRACT.abi,
-        functionName: 'startPaidGame',
-        value: parseEther(SIMPLE_GAME_CONTRACT.gameFee),
+      // Set up a promise that resolves when GameStarted event is received
+      return new Promise((resolve) => {
+        let eventReceived = false;
+        
+        // Set up event listener for GameStarted
+        const handleGameStarted = () => {
+          if (!eventReceived) {
+            eventReceived = true;
+            console.log('GameStarted event received, transaction confirmed!');
+            resolve(true);
+          }
+        };
+        
+        // Listen for GameStarted event
+        window.addEventListener('gameStarted', handleGameStarted);
+        
+        // Call the contract
+        try {
+          writeContract({
+            address: SIMPLE_GAME_CONTRACT.address,
+            abi: SIMPLE_GAME_CONTRACT.abi,
+            functionName: 'startPaidGame',
+            value: parseEther(SIMPLE_GAME_CONTRACT.gameFee),
+          });
+          console.log('Transaction sent to MetaMask, waiting for confirmation...');
+        } catch (error) {
+          console.error('Error starting game:', error);
+          window.removeEventListener('gameStarted', handleGameStarted);
+          resolve(false);
+        }
+        
+        // Timeout after 60 seconds if no event received
+        setTimeout(() => {
+          if (!eventReceived) {
+            eventReceived = true;
+            console.log('Timeout waiting for GameStarted event');
+            window.removeEventListener('gameStarted', handleGameStarted);
+            resolve(false);
+          }
+        }, 60000);
       });
       
-      console.log('Transaction initiated, returning true');
-      return true;
     } catch (error) {
       console.error('Error starting game:', error);
       return false;

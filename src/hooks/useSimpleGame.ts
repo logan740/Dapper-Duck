@@ -9,6 +9,7 @@ import { useState } from 'react';
 export function useSimpleGame() {
   const [currentGameId, setCurrentGameId] = useState<number | null>(null);
   const [isGameActive, setIsGameActive] = useState(false);
+  const [isTransactionConfirmed, setIsTransactionConfirmed] = useState(false);
 
   // Contract reads
   const { data: gameFee } = useReadContract({
@@ -66,12 +67,10 @@ export function useSimpleGame() {
         const { player, gameId, timestamp } = log.args;
         console.log(`Game started: Player ${player}, Game ID ${gameId}, Time ${timestamp}`);
         setCurrentGameId(Number(gameId));
-        setIsGameActive(true);
+        setIsTransactionConfirmed(true);
         
-        // Trigger the game start in game.js
-        if (typeof window !== 'undefined' && (window as any).startPaidGame) {
-          (window as any).startPaidGame(Number(gameId));
-        }
+        // Don't automatically start the game - let the user control when to start
+        console.log('Game transaction confirmed! Ready to start when user is ready.');
       });
     },
   });
@@ -85,6 +84,7 @@ export function useSimpleGame() {
         const { player, gameId, score, timestamp } = log.args;
         console.log(`Game completed: Player ${player}, Game ID ${gameId}, Score ${score}, Time ${timestamp}`);
         setIsGameActive(false);
+        setIsTransactionConfirmed(false);
         setCurrentGameId(null);
       });
     },
@@ -127,6 +127,16 @@ export function useSimpleGame() {
     }
   };
 
+  const startActualGame = () => {
+    if (currentGameId) {
+      setIsGameActive(true);
+      // Trigger the game start in game.js
+      if (typeof window !== 'undefined' && (window as any).startPaidGame) {
+        (window as any).startPaidGame(currentGameId);
+      }
+    }
+  };
+
   return {
     // Contract data
     gameFee: gameFee ? Number(gameFee) : 0,
@@ -139,10 +149,12 @@ export function useSimpleGame() {
     // Game state
     currentGameId,
     isGameActive,
+    isTransactionConfirmed,
     
     // Actions
     startGame,
     endGame,
+    startActualGame,
     
     // Loading states
     isStartingGame,

@@ -25,9 +25,11 @@ export function PayToPlayButton({
   const { 
     gameFee, 
     isGameActive, 
+    isTransactionConfirmed,
     currentGameId,
     startGame, 
     endGame,
+    startActualGame,
     isStartingGame, 
     isEndingGame,
     startGameError,
@@ -94,6 +96,11 @@ export function PayToPlayButton({
           <div className="text-green-600 font-semibold">
             🎮 Game Active - ID: {currentGameId}
           </div>
+        ) : isTransactionConfirmed ? (
+          <div className="text-green-600 font-semibold">
+            ✅ Transaction Confirmed!<br />
+            Game ID: {currentGameId}
+          </div>
         ) : (
           <div className="text-gray-600">
             Ready to play
@@ -102,7 +109,7 @@ export function PayToPlayButton({
       </div>
 
       {/* Pay to Play Button */}
-      {!isGameActive ? (
+      {!isGameActive && !isTransactionConfirmed ? (
         <Button
           onClick={handleStartGame}
           disabled={!isConnected || isStartingGame}
@@ -120,6 +127,13 @@ export function PayToPlayButton({
               <span className="text-sm opacity-90">({gameFee ? (gameFee / 1e18).toFixed(3) : '0.001'} ETH)</span>
             </div>
           )}
+        </Button>
+      ) : isTransactionConfirmed && !isGameActive ? (
+        <Button
+          onClick={startActualGame}
+          className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 text-lg font-semibold rounded-lg shadow-lg transition-all duration-200 hover:scale-105"
+        >
+          🚀 Start Game
         </Button>
       ) : (
         <div className="flex flex-col items-center space-y-3">

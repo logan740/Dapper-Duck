@@ -225,13 +225,13 @@
       // On mobile landscape, use fill scale for full screen coverage
       scale = Math.max(cssW / VIRTUAL_WIDTH, cssH / VIRTUAL_HEIGHT);
     } else {
-      // On desktop, use fill scale for full screen coverage
-      scale = Math.max(cssW / VIRTUAL_WIDTH, cssH / VIRTUAL_HEIGHT);
+      // On desktop, use fit scale to keep death zones proportional and visible
+      scale = Math.min(cssW / VIRTUAL_WIDTH, cssH / VIRTUAL_HEIGHT);
     }
     
     offsetX = (cssW - VIRTUAL_WIDTH * scale) * 0.5;
     offsetY = (cssH - VIRTUAL_HEIGHT * scale) * 0.5;
-    console.log('Scaling:', { cssW, cssH, scale, offsetX, offsetY, isMobile, isPortrait, orientation: isMobile && isPortrait ? 'mobile-portrait' : 'desktop-or-landscape' });
+    console.log('Scaling:', { cssW, cssH, scale, offsetX, offsetY, isMobile, isPortrait, orientation: isMobile && isPortrait ? 'mobile-portrait' : isMobile ? 'mobile-landscape' : 'desktop-fit' });
 
     // Ensure canvas fills the full viewport
     canvas.style.width = cssW + 'px';

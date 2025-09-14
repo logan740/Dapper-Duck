@@ -31,9 +31,10 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        <AbstractWalletProvider chain={chain}>
+        {/* Temporarily disable AbstractWalletProvider to test MetaMask detection */}
+        {/* <AbstractWalletProvider chain={chain}> */}
           {children}
-        </AbstractWalletProvider>
+        {/* </AbstractWalletProvider> */}
       </QueryClientProvider>
     </WagmiProvider>
   );

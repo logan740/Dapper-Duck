@@ -53,8 +53,8 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
   // If not connected, show custom wallet selection
   return (
     <div className={cn("flex space-x-2", className)}>
-      {/* Abstract AGW Button */}
-      <Button
+      {/* Temporarily disable Abstract button to test MetaMask */}
+      {/* <Button
         onClick={async () => {
           setIsConnecting(true);
           try {
@@ -70,7 +70,7 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
       >
         <AbstractLogo className="mr-2 h-4 w-4 group-hover:animate-spin transition-transform" />
         {isConnecting ? 'Connecting...' : 'Abstract'}
-      </Button>
+      </Button> */}
       
       {/* MetaMask Button */}
       <button

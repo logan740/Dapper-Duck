@@ -9,6 +9,7 @@ import Link from "next/link";
 import { useAccount } from "wagmi";
 
 export default function GamePage() {
+  // Trigger deployment
   const { address } = useAccount();
   const { startGame, endGame, startActualGame, showStartGameScreen } = useSimpleGame();
 

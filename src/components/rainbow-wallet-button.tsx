@@ -1,6 +1,6 @@
 "use client";
 
-import { ConnectButton } from '@rainbow-me/rainbowkit';
+// Removed ConnectButton import - using custom connected state display
 import { useLoginWithAbstract } from '@abstract-foundation/agw-react';
 import { useAccount, useConnect } from 'wagmi';
 import { Button } from '@/components/ui/button';
@@ -33,18 +33,19 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
   console.log('🔥 COMPONENT RENDERED 🔥');
   console.log('🔥 COMPONENT RENDERED 🔥');
 
-  // If connected, show the standard ConnectButton
+  // If connected, show custom connected state
   if (isConnected) {
     return (
-      <div className={cn(className)}>
-        <ConnectButton 
-          showBalance={true}
-          chainStatus="icon"
-          accountStatus={{
-            smallScreen: 'avatar',
-            largeScreen: 'full',
-          }}
-        />
+      <div className={cn("flex items-center space-x-2", className)}>
+        <div className="flex items-center space-x-2 px-3 py-2 bg-green-100 dark:bg-green-900 rounded-lg">
+          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+          <span className="text-sm font-medium text-green-800 dark:text-green-200">
+            Connected
+          </span>
+        </div>
+        <div className="text-xs text-gray-600 dark:text-gray-400 font-mono">
+          {address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'Unknown'}
+        </div>
       </div>
     );
   }

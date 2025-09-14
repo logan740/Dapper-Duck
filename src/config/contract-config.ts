@@ -1,9 +1,9 @@
-// Contract configuration for SimpleGame
+// Contract configuration for DapperDuck Full Contract
 export const SIMPLE_GAME_CONTRACT = {
-  // Deployed contract address on Abstract Testnet
-  address: '0x803BC5297E3aBC0D0540757bC871F6b920C99b22' as const,
+  // Deployed contract address on Abstract Testnet (Full DapperDuck Contract)
+  address: '0x5FbDB2315678afecb367f032d93F642f64180aa3' as const,
   
-  // Contract ABI (Application Binary Interface)
+  // Contract ABI (Application Binary Interface) - DapperDuck Full Contract
   abi: [
     {
       "inputs": [],
@@ -42,7 +42,27 @@ export const SIMPLE_GAME_CONTRACT = {
         },
         {
           "internalType": "uint256",
-          "name": "_contractBalance",
+          "name": "_totalRevenue",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_treasuryBalance",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_playersRewardPool",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_currentWeek",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_weekStartTime",
           "type": "uint256"
         }
       ],
@@ -73,6 +93,11 @@ export const SIMPLE_GAME_CONTRACT = {
           "internalType": "uint256",
           "name": "_score",
           "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "_won",
+          "type": "bool"
         }
       ],
       "name": "endPaidGame",

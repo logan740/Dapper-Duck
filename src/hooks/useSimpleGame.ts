@@ -128,7 +128,7 @@ export function useSimpleGame() {
         address: SIMPLE_GAME_CONTRACT.address,
         abi: SIMPLE_GAME_CONTRACT.abi,
         functionName: 'endPaidGame',
-        args: [BigInt(currentGameId), BigInt(score)],
+        args: [BigInt(currentGameId), BigInt(score), true], // true = won (score > 0)
       });
     } catch (error) {
       console.error('Error ending game:', error);
@@ -151,8 +151,19 @@ export function useSimpleGame() {
     gameCounter: gameCounter ? Number(gameCounter) : 0,
     contractStats: contractStats ? {
       totalGames: Number(contractStats[0]),
-      contractBalance: Number(contractStats[1]),
-    } : { totalGames: 0, contractBalance: 0 },
+      totalRevenue: Number(contractStats[1]),
+      treasuryBalance: Number(contractStats[2]),
+      playersRewardPool: Number(contractStats[3]),
+      currentWeek: Number(contractStats[4]),
+      weekStartTime: Number(contractStats[5]),
+    } : { 
+      totalGames: 0, 
+      totalRevenue: 0, 
+      treasuryBalance: 0, 
+      playersRewardPool: 0, 
+      currentWeek: 1, 
+      weekStartTime: 0 
+    },
     
     // Game state
     currentGameId,

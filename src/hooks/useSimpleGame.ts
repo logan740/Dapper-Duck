@@ -197,7 +197,7 @@ export function useSimpleGame() {
     
     // Optional: You can call the contract if you want to track scores on-chain
     // But this should be user-initiated, not automatic
-    if (false && endWriteContract && currentGameId) {
+    if (false && endWriteContract && currentGameId !== null) {
       try {
         await endWriteContract({
           address: SIMPLE_GAME_CONTRACT.address,

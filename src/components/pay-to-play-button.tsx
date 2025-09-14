@@ -88,6 +88,14 @@ export function PayToPlayButton({
     console.error('End game error:', endGameError);
   }
 
+  // Debug logging
+  console.log('PayToPlayButton state:', {
+    isGameActive,
+    isTransactionConfirmed,
+    currentGameId,
+    isConnected
+  });
+
   return (
     <div className={cn("flex flex-col items-center space-y-4", className)}>
       {/* Game Status */}
@@ -174,6 +182,20 @@ export function PayToPlayButton({
         <div>Contract: {SIMPLE_GAME_CONTRACT.address.slice(0, 6)}...{SIMPLE_GAME_CONTRACT.address.slice(-4)}</div>
         <div>Network: Abstract Testnet</div>
       </div>
+
+      {/* Debug Reset Button */}
+      {(isGameActive || isTransactionConfirmed) && (
+        <Button
+          onClick={() => {
+            console.log('Manual reset triggered');
+            // Force a page refresh to reset all state
+            window.location.reload();
+          }}
+          className="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 text-xs"
+        >
+          Reset State
+        </Button>
+      )}
     </div>
   );
 }

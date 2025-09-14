@@ -1,7 +1,7 @@
 import { useReadContract, useWriteContract, useWatchContractEvent } from 'wagmi';
 import { parseEther } from 'viem';
 import { SIMPLE_GAME_CONTRACT } from '@/config/contract-config';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 /**
  * Custom hook for interacting with the SimpleGame contract
@@ -10,6 +10,14 @@ export function useSimpleGame() {
   const [currentGameId, setCurrentGameId] = useState<number | null>(null);
   const [isGameActive, setIsGameActive] = useState(false);
   const [isTransactionConfirmed, setIsTransactionConfirmed] = useState(false);
+
+  // Reset state when component mounts (in case of page refresh)
+  useEffect(() => {
+    console.log('useSimpleGame: Resetting state on mount');
+    setCurrentGameId(null);
+    setIsGameActive(false);
+    setIsTransactionConfirmed(false);
+  }, []);
 
   // Contract reads
   const { data: gameFee } = useReadContract({

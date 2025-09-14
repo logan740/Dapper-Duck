@@ -1324,8 +1324,9 @@
       const result = await window.startPaidGameContract();
       
       if (result) {
-        console.log('Contract transaction successful, starting game...');
-        startGame(true);
+        console.log('Contract transaction successful, waiting for user to start game...');
+        // Don't automatically start the game - wait for user to click "Start Game" button
+        // The startActualGame function will be called from the React component
       } else {
         console.log('Contract transaction failed or cancelled - not starting game');
         // Don't start the game if transaction failed

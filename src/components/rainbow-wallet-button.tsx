@@ -70,72 +70,26 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
       
       {/* MetaMask Button */}
       <Button
-        onClick={async () => {
-          console.log('=== MetaMask Button Clicked ===');
-          console.log('Step 1: Checking window object...');
-          console.log('typeof window:', typeof window);
-          console.log('window exists:', !!window);
+        onClick={() => {
+          console.log('BUTTON CLICKED - START');
+          console.log('BUTTON CLICKED - MIDDLE');
+          console.log('BUTTON CLICKED - END');
           
-          console.log('Step 2: Checking ethereum object...');
-          console.log('window.ethereum exists:', !!(window as any).ethereum);
-          console.log('window.ethereum:', (window as any).ethereum);
-          
-          // Check if MetaMask is available
-          const isMetaMaskInstalled = typeof window !== 'undefined' && 
-            (window as any).ethereum && 
-            (window as any).ethereum.isMetaMask;
-          
-          console.log('Step 3: MetaMask detection...');
-          console.log('MetaMask installed:', isMetaMaskInstalled);
-          
-          if (!isMetaMaskInstalled) {
-            console.log('Step 4: MetaMask not found');
-            alert('MetaMask not found. Please install MetaMask extension.');
-            return;
-          }
-          
-          console.log('Step 5: MetaMask found, proceeding with connection...');
-          
-          try {
-            console.log('Attempting direct MetaMask connection...');
-            
-            // Request account access
-            const accounts = await (window as any).ethereum.request({ 
-              method: 'eth_requestAccounts' 
-            });
-            
-            console.log('MetaMask connected successfully:', accounts);
-            
-            // Try to switch to Abstract testnet (skip if already on it)
-            try {
-              const currentChainId = await (window as any).ethereum.request({
-                method: 'eth_chainId'
+          // Simple test - just try to connect directly
+          if (typeof window !== 'undefined' && (window as any).ethereum) {
+            console.log('MetaMask detected, attempting connection...');
+            (window as any).ethereum.request({ method: 'eth_requestAccounts' })
+              .then((accounts: string[]) => {
+                console.log('MetaMask connected:', accounts);
+                alert('MetaMask connected: ' + accounts[0]);
+              })
+              .catch((error: any) => {
+                console.error('MetaMask connection failed:', error);
+                alert('MetaMask connection failed: ' + error.message);
               });
-              console.log('Current chain ID:', currentChainId);
-              
-              // Only try to switch if not already on Abstract testnet
-              if (currentChainId !== '0x2B7C') {
-                await (window as any).ethereum.request({
-                  method: 'wallet_switchEthereumChain',
-                  params: [{ chainId: '0x2B7C' }], // Abstract testnet chain ID (11124 in hex)
-                });
-                console.log('Switched to Abstract testnet');
-              } else {
-                console.log('Already on Abstract testnet');
-              }
-            } catch (switchError) {
-              console.log('Failed to switch to Abstract testnet:', switchError);
-              // Don't try to add the chain if it already exists - just continue
-              console.log('Continuing with current network...');
-            }
-            
-            // Force page refresh to update UI state
-            console.log('Refreshing page to update UI state...');
-            window.location.reload();
-            
-          } catch (error) {
-            console.error('MetaMask connection failed:', error);
-            alert('Failed to connect to MetaMask. Please try again.');
+          } else {
+            console.log('MetaMask not detected');
+            alert('MetaMask not detected');
           }
         }}
         className="cursor-pointer group min-w-32"

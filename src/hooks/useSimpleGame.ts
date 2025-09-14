@@ -10,6 +10,7 @@ export function useSimpleGame() {
   const [currentGameId, setCurrentGameId] = useState<number | null>(null);
   const [isGameActive, setIsGameActive] = useState(false);
   const [isTransactionConfirmed, setIsTransactionConfirmed] = useState(false);
+  const [showStartGameScreen, setShowStartGameScreen] = useState(false);
 
   // Reset state when component mounts (in case of page refresh)
   useEffect(() => {
@@ -17,6 +18,7 @@ export function useSimpleGame() {
     setCurrentGameId(null);
     setIsGameActive(false);
     setIsTransactionConfirmed(false);
+    setShowStartGameScreen(false);
   }, []);
 
   // Contract reads
@@ -82,7 +84,9 @@ export function useSimpleGame() {
         console.log('Game transaction confirmed! Ready to start when user is ready.');
         
         // Dispatch custom event for startGame function to listen to
+        console.log('Dispatching gameStarted custom event...');
         window.dispatchEvent(new CustomEvent('gameStarted'));
+        console.log('gameStarted custom event dispatched');
       });
     },
   });
@@ -117,7 +121,7 @@ export function useSimpleGame() {
         'Ready to start a paid game?\n\n' +
         'This will:\n' +
         '1. Open MetaMask for 0.001 ETH payment\n' +
-        '2. Start the game after you confirm the transaction\n\n' +
+        '2. Show "Start Game" screen after transaction confirms\n\n' +
         'Click OK to proceed, or Cancel to abort.'
       );
       
@@ -126,47 +130,22 @@ export function useSimpleGame() {
         return false;
       }
       
-      // Set up a promise that resolves when GameStarted event is received
-      return new Promise((resolve) => {
-        let eventReceived = false;
-        
-        // Set up event listener for GameStarted
-        const handleGameStarted = () => {
-          if (!eventReceived) {
-            eventReceived = true;
-            console.log('GameStarted event received, transaction confirmed!');
-            resolve(true);
-          }
-        };
-        
-        // Listen for GameStarted event
-        window.addEventListener('gameStarted', handleGameStarted);
-        
-        // Call the contract
-        try {
-          writeContract({
-            address: SIMPLE_GAME_CONTRACT.address,
-            abi: SIMPLE_GAME_CONTRACT.abi,
-            functionName: 'startPaidGame',
-            value: parseEther(SIMPLE_GAME_CONTRACT.gameFee),
-          });
-          console.log('Transaction sent to MetaMask, waiting for confirmation...');
-        } catch (error) {
-          console.error('Error starting game:', error);
-          window.removeEventListener('gameStarted', handleGameStarted);
-          resolve(false);
-        }
-        
-        // Timeout after 60 seconds if no event received
-        setTimeout(() => {
-          if (!eventReceived) {
-            eventReceived = true;
-            console.log('Timeout waiting for GameStarted event');
-            window.removeEventListener('gameStarted', handleGameStarted);
-            resolve(false);
-          }
-        }, 60000);
+      // Call the contract
+      writeContract({
+        address: SIMPLE_GAME_CONTRACT.address,
+        abi: SIMPLE_GAME_CONTRACT.abi,
+        functionName: 'startPaidGame',
+        value: parseEther(SIMPLE_GAME_CONTRACT.gameFee),
       });
+      
+      console.log('Transaction sent to MetaMask, waiting for confirmation...');
+      
+      // Wait for transaction confirmation (simple delay approach)
+      await new Promise(resolve => setTimeout(resolve, 3000)); // Wait 3 seconds
+      
+      console.log('Transaction confirmed, showing start game screen');
+      setShowStartGameScreen(true);
+      return true;
       
     } catch (error) {
       console.error('Error starting game:', error);
@@ -193,12 +172,11 @@ export function useSimpleGame() {
   };
 
   const startActualGame = () => {
-    if (currentGameId) {
-      setIsGameActive(true);
-      // Trigger the game start in game.js
-      if (typeof window !== 'undefined' && (window as any).startPaidGame) {
-        (window as any).startPaidGame(currentGameId);
-      }
+    console.log('Starting actual game...');
+    setShowStartGameScreen(false);
+    setIsGameActive(true);
+    if (typeof window !== 'undefined' && (window as any).startPaidGame) {
+      (window as any).startPaidGame(currentGameId);
     }
   };
 
@@ -226,6 +204,7 @@ export function useSimpleGame() {
     currentGameId,
     isGameActive,
     isTransactionConfirmed,
+    showStartGameScreen,
     
     // Actions
     startGame,

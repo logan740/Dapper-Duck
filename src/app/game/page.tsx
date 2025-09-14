@@ -4,12 +4,13 @@ import Script from "next/script";
 import { useEffect } from "react";
 import { RainbowWalletButton } from "@/components/rainbow-wallet-button";
 import { useSimpleGame } from "@/hooks/useSimpleGame";
+import { StartGameScreen } from "@/components/start-game-screen";
 import Link from "next/link";
 import { useAccount } from "wagmi";
 
 export default function GamePage() {
   const { address } = useAccount();
-  const { startGame, endGame } = useSimpleGame();
+  const { startGame, endGame, startActualGame, showStartGameScreen } = useSimpleGame();
 
   // Ensure full-viewport sizing for canvas and mobile optimization
   useEffect(() => {
@@ -204,6 +205,17 @@ export default function GamePage() {
       <div className="absolute top-4 right-4 z-50">
         <RainbowWalletButton />
       </div>
+
+      {/* Start Game Screen */}
+      {showStartGameScreen && (
+        <StartGameScreen
+          onStartGame={startActualGame}
+          onCancel={() => {
+            // Reset the state when user cancels
+            window.location.reload();
+          }}
+        />
+      )}
 
       {/* Load Game Script */}
       <Script src="/game.js" strategy="afterInteractive" />

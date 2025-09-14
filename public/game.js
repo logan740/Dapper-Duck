@@ -184,7 +184,7 @@
       BOTTOM_DEAD_ZONE = innerDeadZone;
     } else if (!isMobile && !isTablet) {
       // Desktop: Use smaller death zones for larger play area - UPDATED
-      const desktopDeadZone = Math.max(50, virtualDeadZone - 50);
+      const desktopDeadZone = Math.max(60, virtualDeadZone - 60);
       TOP_DEAD_ZONE = desktopDeadZone;
       BOTTOM_DEAD_ZONE = desktopDeadZone;
     } else {
@@ -1186,7 +1186,7 @@
     
     console.log('Death zone indicators:', { cssW, cssH, isMobile, isPortrait, isTablet, isDesktop, gameState: state });
     
-    // Only show indicators for mobile portrait and desktop during gameplay
+    // Show indicators for mobile portrait and desktop during gameplay
     if (!(isMobile && isPortrait) && !isDesktop) {
       console.log('Not showing indicators - device type not supported');
       return; // Don't show indicators on mobile landscape or tablets
@@ -1199,7 +1199,7 @@
     if (isMobile && isPortrait) {
       offScreenBuffer = 60; // Mobile portrait
     } else if (isDesktop) {
-      offScreenBuffer = 20; // Desktop - same as death zone buffer
+      offScreenBuffer = 60; // Desktop - same as mobile for consistent visual danger zones
     } else {
       offScreenBuffer = 60; // Default for all other devices
     }
@@ -1210,10 +1210,10 @@
     // Draw warning zones at top and bottom
     ctx.save();
     
-    // ALWAYS draw danger zones for ALL devices
+    // Draw danger zones for mobile portrait and desktop
     console.log('Drawing danger zones with visualDeadZone:', visualDeadZone);
     
-    // Full danger zones for all devices
+    // Red danger zones with death zones inside them
     ctx.fillStyle = 'rgba(255, 0, 0, 0.4)'; // More visible red
     ctx.fillRect(0, 0, VIRTUAL_WIDTH, visualDeadZone);
     ctx.fillRect(0, VIRTUAL_HEIGHT - visualDeadZone, VIRTUAL_WIDTH, visualDeadZone);

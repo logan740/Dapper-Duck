@@ -1320,20 +1320,20 @@
     try {
       console.log('Starting paid game flow with contract...');
       
-      // Call the contract to start a paid game
+      // Call the contract to start a paid game and wait for it to complete
       const result = await window.startPaidGameContract();
       
       if (result) {
         console.log('Contract transaction successful, starting game...');
         startGame(true);
       } else {
-        console.log('Contract transaction failed or cancelled');
+        console.log('Contract transaction failed or cancelled - not starting game');
+        // Don't start the game if transaction failed
       }
     } catch (error) {
       console.error('Error in paid game flow:', error);
-      // Fallback: start game without contract if there's an error
-      console.log('Falling back to direct game start...');
-      startGame(true);
+      console.log('Contract transaction failed - not starting game');
+      // Don't start the game if there's an error
     }
   }
 

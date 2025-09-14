@@ -90,7 +90,12 @@ export default function GamePage() {
       (window as any).startPaidGameFromReact = async () => {
         try {
           console.log('React: Starting paid game contract...');
-          await startGame();
+          const result = await startGame();
+          console.log('React: Contract transaction result:', result);
+          
+          // Wait a moment for the transaction to be processed
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
           return true;
         } catch (error) {
           console.error('React: Error starting paid game:', error);

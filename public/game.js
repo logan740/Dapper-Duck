@@ -193,7 +193,7 @@
       BOTTOM_DEAD_ZONE = virtualDeadZone;
     }
     
-    console.log('Device-optimized dead zones calculated:', {
+    console.log('Device-optimized dead zones calculated (updated):', {
       deviceType: isMobile ? 'mobile' : isTablet ? 'tablet' : 'desktop',
       isMobileDevice: isMobileDevice,
       screenWidth: cssW,

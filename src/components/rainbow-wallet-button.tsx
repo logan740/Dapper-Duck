@@ -70,59 +70,50 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
       
       {/* MetaMask Button */}
       <Button
-        onClick={async () => {
-          console.log('BUTTON CLICKED - START');
-          console.log('BUTTON CLICKED - MIDDLE');
-          console.log('BUTTON CLICKED - END');
-          
-          if (typeof window !== 'undefined' && (window as any).ethereum) {
-            console.log('MetaMask detected, attempting connection...');
-            
-            try {
-              // First, connect directly to MetaMask
-              const accounts = await (window as any).ethereum.request({ 
-                method: 'eth_requestAccounts' 
-              });
-              console.log('MetaMask connected:', accounts);
-              
-              // Now find the MetaMask connector in wagmi and connect through it
-              console.log('Available connectors:', connectors.map(c => ({ name: c.name, id: c.id })));
-              
-              // Find MetaMask connector (exclude abstract, privy, magic)
-              const metaMaskConnector = connectors.find(connector => 
-                connector.name.toLowerCase().includes('metamask') ||
-                connector.id.toLowerCase().includes('metamask') ||
-                (connector.name.toLowerCase().includes('injected') && 
-                 !connector.name.toLowerCase().includes('abstract') &&
-                 !connector.name.toLowerCase().includes('privy') &&
-                 !connector.name.toLowerCase().includes('magic'))
-              );
-              
-              console.log('Found MetaMask connector:', metaMaskConnector?.name, metaMaskConnector?.id);
-              
-              if (metaMaskConnector) {
-                console.log('Connecting through wagmi...');
-                await connect({ connector: metaMaskConnector });
-                console.log('Successfully connected through wagmi!');
-                alert('MetaMask connected and UI updated!');
-              } else {
-                console.log('No MetaMask connector found, refreshing page...');
-                window.location.reload();
-              }
-              
-            } catch (error) {
-              console.error('MetaMask connection failed:', error);
-              alert('MetaMask connection failed: ' + (error as Error).message);
-            }
-          } else {
-            console.log('MetaMask not detected');
-            alert('MetaMask not detected');
-          }
+        onClick={() => {
+          console.log('🔥 META MASK BUTTON CLICKED 🔥');
+          console.log('🔥 META MASK BUTTON CLICKED 🔥');
+          console.log('🔥 META MASK BUTTON CLICKED 🔥');
+          alert('MetaMask button was clicked!');
+        }}
+        onMouseDown={() => {
+          console.log('🖱️ META MASK BUTTON MOUSE DOWN 🖱️');
+        }}
+        onMouseUp={() => {
+          console.log('🖱️ META MASK BUTTON MOUSE UP 🖱️');
+        }}
+        onTouchStart={() => {
+          console.log('👆 META MASK BUTTON TOUCH START 👆');
+        }}
+        onTouchEnd={() => {
+          console.log('👆 META MASK BUTTON TOUCH END 👆');
+        }}
+        style={{ 
+          backgroundColor: 'red', 
+          color: 'white',
+          border: '3px solid yellow',
+          fontSize: '20px',
+          padding: '20px'
         }}
         className="cursor-pointer group min-w-32"
       >
         <MetaMaskIcon className="mr-2 h-4 w-4 group-hover:animate-spin transition-transform" />
-        MetaMask
+        🔥 META MASK 🔥
+      </Button>
+      
+      {/* Test Button */}
+      <Button
+        onClick={() => {
+          console.log('TEST BUTTON CLICKED');
+          alert('Test button works!');
+        }}
+        style={{ 
+          backgroundColor: 'blue', 
+          color: 'white',
+          marginLeft: '10px'
+        }}
+      >
+        TEST BUTTON
       </Button>
     </div>
   );

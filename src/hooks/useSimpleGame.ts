@@ -1,5 +1,5 @@
-import { useReadContract, useWriteContract, useWatchContractEvent } from 'wagmi';
-import { parseEther } from 'viem';
+import { useReadContract, useWriteContract, useWatchContractEvent, useSendTransaction } from 'wagmi';
+import { parseEther, encodeFunctionData } from 'viem';
 import { SIMPLE_GAME_CONTRACT } from '@/config/contract-config';
 import { useState, useEffect } from 'react';
 
@@ -54,6 +54,18 @@ export function useSimpleGame() {
     },
   });
 
+  // Send transaction hook for better control
+  const { sendTransaction, isPending: isSendingTransaction, error: sendError } = useSendTransaction({
+    mutation: {
+      onSuccess: (hash) => {
+        console.log('Transaction sent successfully:', hash);
+        // Don't set game active here - wait for confirmation
+      },
+      onError: (error) => {
+        console.error('Failed to send transaction:', error);
+      },
+    },
+  });
 
   const { writeContract: endWriteContract, isPending: isEndingGame, error: endGameError } = useWriteContract({
     mutation: {
@@ -108,8 +120,8 @@ export function useSimpleGame() {
 
   // Helper functions
   const startGame = async () => {
-    if (!writeContract) {
-      console.error('writeContract function not available');
+    if (!sendTransaction) {
+      console.error('sendTransaction function not available');
       return false;
     }
     
@@ -130,22 +142,50 @@ export function useSimpleGame() {
         return false;
       }
       
-      // Call the contract
-      writeContract({
-        address: SIMPLE_GAME_CONTRACT.address,
+      // Encode the function call
+      const data = encodeFunctionData({
         abi: SIMPLE_GAME_CONTRACT.abi,
         functionName: 'startPaidGame',
-        value: parseEther(SIMPLE_GAME_CONTRACT.gameFee),
       });
       
-      console.log('Transaction sent to MetaMask, waiting for confirmation...');
+      // Send the transaction
+      const hash = await sendTransaction({
+        to: SIMPLE_GAME_CONTRACT.address,
+        value: parseEther(SIMPLE_GAME_CONTRACT.gameFee),
+        data: data,
+      });
       
-      // Wait for transaction confirmation (simple delay approach)
-      await new Promise(resolve => setTimeout(resolve, 3000)); // Wait 3 seconds
+      console.log('Transaction sent to MetaMask, hash:', hash);
+      console.log('Waiting for blockchain confirmation...');
       
-      console.log('Transaction confirmed, showing start game screen');
-      setShowStartGameScreen(true);
-      return true;
+      // Wait for the GameStarted event to be emitted (actual confirmation)
+      return new Promise((resolve) => {
+        let eventReceived = false;
+        
+        const handleGameStarted = () => {
+          if (!eventReceived) {
+            eventReceived = true;
+            console.log('GameStarted event received - transaction confirmed on blockchain!');
+            window.removeEventListener('gameStarted', handleGameStarted);
+            setShowStartGameScreen(true);
+            resolve(true);
+          }
+        };
+        
+        // Listen for the GameStarted event
+        window.addEventListener('gameStarted', handleGameStarted);
+        
+        // Fallback timeout after 30 seconds
+        setTimeout(() => {
+          if (!eventReceived) {
+            eventReceived = true;
+            console.log('Timeout waiting for GameStarted event, showing start screen anyway');
+            window.removeEventListener('gameStarted', handleGameStarted);
+            setShowStartGameScreen(true);
+            resolve(true);
+          }
+        }, 30000);
+      });
       
     } catch (error) {
       console.error('Error starting game:', error);
@@ -212,7 +252,7 @@ export function useSimpleGame() {
     startActualGame,
     
     // Loading states
-    isStartingGame,
+    isStartingGame: isStartingGame || isSendingTransaction,
     isEndingGame,
     
     // Errors

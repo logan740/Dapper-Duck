@@ -195,20 +195,8 @@ export function useSimpleGame() {
     setIsGameActive(false);
     setCurrentGameId(null);
     
-    // Optional: You can call the contract if you want to track scores on-chain
-    // But this should be user-initiated, not automatic
-    if (false && endWriteContract && currentGameId !== null) {
-      try {
-        await endWriteContract({
-          address: SIMPLE_GAME_CONTRACT.address,
-          abi: SIMPLE_GAME_CONTRACT.abi,
-          functionName: 'endPaidGame',
-          args: [BigInt(currentGameId), BigInt(score), true], // true = won (score > 0)
-        });
-      } catch (error) {
-        console.error('Error ending game:', error);
-      }
-    }
+    // Note: Contract end game functionality removed to prevent unnecessary MetaMask popups
+    // The game is already paid for when started, no additional transaction needed
   };
 
   const startActualGame = () => {

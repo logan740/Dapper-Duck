@@ -93,35 +93,27 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
             
             console.log('MetaMask connected successfully:', accounts);
             
-            // Request to switch to Abstract testnet
+            // Try to switch to Abstract testnet (skip if already on it)
             try {
-              await (window as any).ethereum.request({
-                method: 'wallet_switchEthereumChain',
-                params: [{ chainId: '0x2B7C' }], // Abstract testnet chain ID (11124 in hex)
+              const currentChainId = await (window as any).ethereum.request({
+                method: 'eth_chainId'
               });
-              console.log('Switched to Abstract testnet');
+              console.log('Current chain ID:', currentChainId);
+              
+              // Only try to switch if not already on Abstract testnet
+              if (currentChainId !== '0x2B7C') {
+                await (window as any).ethereum.request({
+                  method: 'wallet_switchEthereumChain',
+                  params: [{ chainId: '0x2B7C' }], // Abstract testnet chain ID (11124 in hex)
+                });
+                console.log('Switched to Abstract testnet');
+              } else {
+                console.log('Already on Abstract testnet');
+              }
             } catch (switchError) {
               console.log('Failed to switch to Abstract testnet:', switchError);
-              // Try to add the chain if it doesn't exist
-              try {
-                await (window as any).ethereum.request({
-                  method: 'wallet_addEthereumChain',
-                  params: [{
-                    chainId: '0x2B7C', // 11124 in hex
-                    chainName: 'Abstract Testnet',
-                    nativeCurrency: {
-                      name: 'Ether',
-                      symbol: 'ETH',
-                      decimals: 18,
-                    },
-                    rpcUrls: ['https://api.testnet.abs.xyz'],
-                    blockExplorerUrls: ['https://sepolia.abscan.org/'],
-                  }],
-                });
-                console.log('Added Abstract testnet');
-              } catch (addError) {
-                console.log('Failed to add Abstract testnet:', addError);
-              }
+              // Don't try to add the chain if it already exists - just continue
+              console.log('Continuing with current network...');
             }
             
             // Force page refresh to update UI state

@@ -3,11 +3,13 @@
 import Script from "next/script";
 import { useEffect } from "react";
 import { RainbowWalletButton } from "@/components/rainbow-wallet-button";
+import { useSimpleGame } from "@/hooks/useSimpleGame";
 import Link from "next/link";
 import { useAccount } from "wagmi";
 
 export default function GamePage() {
   const { address } = useAccount();
+  const { startGame, endGame } = useSimpleGame();
 
   // Ensure full-viewport sizing for canvas and mobile optimization
   useEffect(() => {
@@ -81,6 +83,35 @@ export default function GamePage() {
     }
   }, [address]);
 
+  // Set up contract integration functions for the game
+  useEffect(() => {
+    if (typeof window !== 'undefined' && startGame && endGame) {
+      // Set the contract functions for the game to use
+      (window as any).startPaidGameFromReact = async () => {
+        try {
+          console.log('React: Starting paid game contract...');
+          await startGame();
+          return true;
+        } catch (error) {
+          console.error('React: Error starting paid game:', error);
+          return false;
+        }
+      };
+
+      (window as any).endPaidGameFromReact = async (gameId: number, score: number) => {
+        try {
+          console.log('React: Ending paid game contract...', gameId, score);
+          await endGame(score);
+          return true;
+        } catch (error) {
+          console.error('React: Error ending paid game:', error);
+          return false;
+        }
+      };
+
+      console.log('Game page: Contract integration functions set up');
+    }
+  }, [startGame, endGame]);
 
   return (
     <div className="relative w-screen h-screen overflow-hidden touch-none select-none" style={{ height: '100vh' }}>

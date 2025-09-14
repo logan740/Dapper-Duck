@@ -1310,17 +1310,31 @@
   }
 
   // ---------------- Enhanced Game Management ----------------
-  function startPaidGameFlow() {
+  async function startPaidGameFlow() {
     // Check if wallet is connected
     if (typeof window.ethereum === 'undefined') {
       alert('Please install MetaMask to play paid games!');
       return;
     }
     
-    // For now, just start a paid game directly
-    // In the future, this would call the contract first
-    console.log('Starting paid game flow...');
-    startGame(true);
+    try {
+      console.log('Starting paid game flow with contract...');
+      
+      // Call the contract to start a paid game
+      const result = await window.startPaidGameContract();
+      
+      if (result) {
+        console.log('Contract transaction successful, starting game...');
+        startGame(true);
+      } else {
+        console.log('Contract transaction failed or cancelled');
+      }
+    } catch (error) {
+      console.error('Error in paid game flow:', error);
+      // Fallback: start game without contract if there's an error
+      console.log('Falling back to direct game start...');
+      startGame(true);
+    }
   }
 
   function startGame(isPaid = false) {
@@ -1654,15 +1668,49 @@
     }
   };
 
+  // Contract integration functions
+  window.startPaidGameContract = async function() {
+    try {
+      // Check if wagmi functions are available
+      if (typeof window.startPaidGameFromReact === 'function') {
+        console.log('Calling React contract function...');
+        return await window.startPaidGameFromReact();
+      } else {
+        console.log('React contract functions not available, using fallback');
+        return false;
+      }
+    } catch (error) {
+      console.error('Error calling contract:', error);
+      return false;
+    }
+  };
+
+  window.endPaidGameContract = async function(gameId, score) {
+    try {
+      // Check if wagmi functions are available
+      if (typeof window.endPaidGameFromReact === 'function') {
+        console.log('Calling React end game function...');
+        return await window.endPaidGameFromReact(gameId, score);
+      } else {
+        console.log('React contract functions not available');
+        return false;
+      }
+    } catch (error) {
+      console.error('Error calling end game contract:', error);
+      return false;
+    }
+  };
+
   // Modify the game over logic to handle paid games
   const originalGameOver = gameOver;
   gameOver = function(reason) {
     // Call original game over logic
     originalGameOver(reason);
     
-    // If this was a paid game, end it
+    // If this was a paid game, end it with contract
     if (isPaidGame && currentPaidGameId) {
-      window.endPaidGame(score);
+      console.log('Paid game ended, calling contract...');
+      window.endPaidGameContract(currentPaidGameId, score);
     }
   };
 

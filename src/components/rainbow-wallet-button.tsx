@@ -71,12 +71,16 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
       {/* MetaMask Button */}
       <Button
         onClick={async () => {
-          console.log('=== MetaMask Direct Connection ===');
+          console.log('=== MetaMask Button Clicked ===');
+          alert('MetaMask button clicked! Check console for details.');
           
           // Check if MetaMask is available
           const isMetaMaskInstalled = typeof window !== 'undefined' && 
             (window as any).ethereum && 
             (window as any).ethereum.isMetaMask;
+          
+          console.log('MetaMask installed:', isMetaMaskInstalled);
+          console.log('window.ethereum:', (window as any).ethereum);
           
           if (!isMetaMaskInstalled) {
             alert('MetaMask not found. Please install MetaMask extension.');

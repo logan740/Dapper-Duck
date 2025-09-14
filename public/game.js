@@ -184,7 +184,7 @@
       BOTTOM_DEAD_ZONE = innerDeadZone;
     } else if (!isMobile && !isTablet) {
       // Desktop: Use much larger death zones to prevent off-screen falling
-      const desktopDeadZone = Math.max(120, virtualDeadZone - 20);
+      const desktopDeadZone = Math.max(115, virtualDeadZone - 20);
       TOP_DEAD_ZONE = desktopDeadZone;
       BOTTOM_DEAD_ZONE = desktopDeadZone;
     } else {

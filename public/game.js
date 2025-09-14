@@ -181,12 +181,18 @@
       const innerDeadZone = Math.max(20, virtualDeadZone - 20);
       TOP_DEAD_ZONE = innerDeadZone;
       BOTTOM_DEAD_ZONE = innerDeadZone;
+    } else if (!isMobile && !isTablet) {
+      // Desktop: Use larger death zones for better gameplay
+      const desktopDeadZone = Math.max(80, virtualDeadZone + 40);
+      TOP_DEAD_ZONE = desktopDeadZone;
+      BOTTOM_DEAD_ZONE = desktopDeadZone;
     } else {
+      // Tablet and other devices
       TOP_DEAD_ZONE = virtualDeadZone;
       BOTTOM_DEAD_ZONE = virtualDeadZone;
     }
     
-    console.log('Mobile-optimized dead zones calculated:', {
+    console.log('Device-optimized dead zones calculated:', {
       deviceType: isMobile ? 'mobile' : isTablet ? 'tablet' : 'desktop',
       screenWidth: cssW,
       screenHeight: cssH,
@@ -196,7 +202,8 @@
       virtualDeadZone: virtualDeadZone,
       topDeadZone: TOP_DEAD_ZONE,
       bottomDeadZone: BOTTOM_DEAD_ZONE,
-      isPortrait: isPortrait
+      isPortrait: isPortrait,
+      desktopOptimized: !isMobile && !isTablet
     });
   }
 

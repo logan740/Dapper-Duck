@@ -262,9 +262,9 @@
   const elPowerupTimer = document.getElementById('powerup-timer');
 
   elFreeGame.addEventListener('click', () => startGame(false));
-  // Paid game button is disabled - coming soon
+  // Paid game button - start paid game flow
   elPaidGame.addEventListener('click', () => {
-    alert('Paid games coming soon! Smart contracts are being finalized. 🚀');
+    startPaidGameFlow();
   });
   elRetry.addEventListener('click', () => startGame(false)); // Default to free on retry
 
@@ -1310,6 +1310,19 @@
   }
 
   // ---------------- Enhanced Game Management ----------------
+  function startPaidGameFlow() {
+    // Check if wallet is connected
+    if (typeof window.ethereum === 'undefined') {
+      alert('Please install MetaMask to play paid games!');
+      return;
+    }
+    
+    // For now, just start a paid game directly
+    // In the future, this would call the contract first
+    console.log('Starting paid game flow...');
+    startGame(true);
+  }
+
   function startGame(isPaid = false) {
     worldX = 0;
     timeAlive = 0;

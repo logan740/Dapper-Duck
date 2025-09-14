@@ -3,14 +3,11 @@
 import Script from "next/script";
 import { useEffect } from "react";
 import { RainbowWalletButton } from "@/components/rainbow-wallet-button";
-import { PayToPlayButton } from "@/components/pay-to-play-button";
-import { useSimpleGame } from "@/hooks/useSimpleGame";
 import Link from "next/link";
 import { useAccount } from "wagmi";
 
 export default function GamePage() {
   const { address } = useAccount();
-  const { endGame } = useSimpleGame();
 
   // Ensure full-viewport sizing for canvas and mobile optimization
   useEffect(() => {
@@ -84,17 +81,6 @@ export default function GamePage() {
     }
   }, [address]);
 
-  // Set up contract integration functions for the game
-  useEffect(() => {
-    if (typeof window !== 'undefined' && endGame) {
-      // Set the contract's endPaidGame function for the game to use
-      (window as any).setEndPaidGameContract = (gameId: number, score: number) => {
-        console.log('Game calling contract endPaidGame:', gameId, score);
-        endGame(score);
-      };
-      console.log('Game page: Contract integration functions set up');
-    }
-  }, [endGame]);
 
   return (
     <div className="relative w-screen h-screen overflow-hidden touch-none select-none" style={{ height: '100vh' }}>
@@ -140,20 +126,12 @@ export default function GamePage() {
               >
                 🆓 Free Game
               </button>
-                     <PayToPlayButton 
-                       className="w-full"
-                       onGameStarted={(gameId) => {
-                         console.log('Game started with ID:', gameId);
-                         // Trigger the paid game in the game.js
-                         if (typeof window !== 'undefined' && (window as any).startPaidGame) {
-                           (window as any).startPaidGame(gameId);
-                         }
-                       }}
-                       onGameEnded={(score) => {
-                         console.log('Game ended with score:', score);
-                         // The game.js will handle the end game logic
-                       }}
-                     />
+                     <button
+                       id="paidGameBtn"
+                       className="w-full rounded-xl bg-blue-500 hover:bg-blue-600 px-4 py-3 text-white font-bold shadow transition-colors"
+                     >
+                       💎 Pay 0.001 ETH to Play
+                     </button>
             </div>
           </div>
         </div>

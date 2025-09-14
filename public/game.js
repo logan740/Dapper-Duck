@@ -183,8 +183,8 @@
       TOP_DEAD_ZONE = innerDeadZone;
       BOTTOM_DEAD_ZONE = innerDeadZone;
     } else if (!isMobile && !isTablet) {
-      // Desktop: Use very large death zones to prevent going off screen
-      const desktopDeadZone = Math.max(200, virtualDeadZone + 150);
+      // Desktop: Use reasonable death zones to prevent going off screen
+      const desktopDeadZone = Math.max(100, virtualDeadZone + 50);
       TOP_DEAD_ZONE = desktopDeadZone;
       BOTTOM_DEAD_ZONE = desktopDeadZone;
     } else {
@@ -1177,9 +1177,11 @@
     const cssW = window.innerWidth;
     const cssH = window.innerHeight;
     // Fix device detection - mobile portrait is height > width
-    const isMobile = cssH > cssW || cssH < 800;
+    // Use consistent device detection with the main function
+    const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isMobile = isMobileDevice || (cssH > cssW && cssH < 800);
     const isPortrait = cssH > cssW;
-    const isTablet = cssH >= 800 && cssH < 1200 && cssW < 1200;
+    const isTablet = !isMobileDevice && cssH >= 800 && cssH < 1200 && cssW < 1200;
     const isDesktop = !isMobile && !isTablet;
     
     console.log('Death zone indicators:', { cssW, cssH, isMobile, isPortrait, isTablet, isDesktop, gameState: state });

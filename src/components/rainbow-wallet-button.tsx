@@ -78,15 +78,39 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
           
           console.log('Available connectors:', connectors.map(c => ({ name: c.name, id: c.id })));
           
-          // Find MetaMask connector first
-          const metaMaskConnector = connectors.find(connector => 
+          // Debug: Log each connector individually
+          connectors.forEach((connector, index) => {
+            console.log(`Connector ${index}:`, {
+              name: connector.name,
+              id: connector.id,
+              type: connector.type
+            });
+          });
+          
+          // Find MetaMask connector first - try multiple approaches
+          let metaMaskConnector = connectors.find(connector => 
             connector.name.toLowerCase().includes('metamask') ||
-            connector.id.toLowerCase().includes('metamask') ||
-            (connector.name.toLowerCase().includes('injected') && 
-             !connector.name.toLowerCase().includes('abstract') &&
-             !connector.name.toLowerCase().includes('privy') &&
-             !connector.name.toLowerCase().includes('magic'))
+            connector.id.toLowerCase().includes('metamask')
           );
+          
+          // If not found by name/id, try injected connector
+          if (!metaMaskConnector) {
+            metaMaskConnector = connectors.find(connector => 
+              connector.name.toLowerCase().includes('injected') && 
+              !connector.name.toLowerCase().includes('abstract') &&
+              !connector.name.toLowerCase().includes('privy') &&
+              !connector.name.toLowerCase().includes('magic')
+            );
+          }
+          
+          // If still not found, try any connector that's not Abstract/Privy/Magic
+          if (!metaMaskConnector) {
+            metaMaskConnector = connectors.find(connector => 
+              !connector.name.toLowerCase().includes('abstract') &&
+              !connector.name.toLowerCase().includes('privy') &&
+              !connector.name.toLowerCase().includes('magic')
+            );
+          }
           
           console.log('Found MetaMask connector:', metaMaskConnector?.name, metaMaskConnector?.id);
           

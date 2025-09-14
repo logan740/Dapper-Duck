@@ -136,11 +136,24 @@ export function useSimpleGame() {
       
       console.log('Transaction hash:', hash);
       
-      // Wait for transaction confirmation
-      console.log('Waiting for transaction confirmation...');
-      await new Promise(resolve => setTimeout(resolve, 3000)); // Wait 3 seconds for confirmation
+      // Wait for user to confirm transaction completion
+      console.log('Transaction sent! Please confirm in MetaMask and wait for confirmation...');
       
-      console.log('Transaction confirmed, returning true');
+      // Show a confirmation dialog
+      const userConfirmed = window.confirm(
+        'Transaction sent to MetaMask! Please:\n\n' +
+        '1. Confirm the transaction in MetaMask\n' +
+        '2. Wait for it to be confirmed on the blockchain\n' +
+        '3. Click OK when the transaction is confirmed\n\n' +
+        'Click OK to start the game, or Cancel to abort.'
+      );
+      
+      if (!userConfirmed) {
+        console.log('User cancelled game start');
+        return false;
+      }
+      
+      console.log('User confirmed transaction, starting game');
       return true;
     } catch (error) {
       console.error('Error starting game:', error);

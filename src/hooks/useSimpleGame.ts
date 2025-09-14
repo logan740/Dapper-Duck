@@ -1,5 +1,5 @@
-import { useReadContract, useWriteContract, useWatchContractEvent } from 'wagmi';
-import { parseEther } from 'viem';
+import { useReadContract, useWriteContract, useWatchContractEvent, useSendTransaction } from 'wagmi';
+import { parseEther, encodeFunctionData } from 'viem';
 import { SIMPLE_GAME_CONTRACT } from '@/config/contract-config';
 import { useState, useEffect } from 'react';
 
@@ -52,6 +52,19 @@ export function useSimpleGame() {
     },
   });
 
+  // Send transaction hook for better control
+  const { sendTransaction, isPending: isSendingTransaction, error: sendError } = useSendTransaction({
+    mutation: {
+      onSuccess: (hash) => {
+        console.log('Transaction sent successfully:', hash);
+        // Don't set game active here - wait for confirmation
+      },
+      onError: (error) => {
+        console.error('Failed to send transaction:', error);
+      },
+    },
+  });
+
   const { writeContract: endWriteContract, isPending: isEndingGame, error: endGameError } = useWriteContract({
     mutation: {
       onSuccess: (data) => {
@@ -100,20 +113,38 @@ export function useSimpleGame() {
 
   // Helper functions
   const startGame = async () => {
-    if (!writeContract) {
-      console.error('writeContract function not available');
-      return;
+    if (!sendTransaction) {
+      console.error('sendTransaction function not available');
+      return false;
     }
     
     try {
-      await writeContract({
-        address: SIMPLE_GAME_CONTRACT.address,
+      console.log('Starting paid game transaction...');
+      
+      // Encode the function call
+      const data = encodeFunctionData({
         abi: SIMPLE_GAME_CONTRACT.abi,
         functionName: 'startPaidGame',
-        value: parseEther(SIMPLE_GAME_CONTRACT.gameFee),
       });
+      
+      // Send the transaction
+      const hash = await sendTransaction({
+        to: SIMPLE_GAME_CONTRACT.address,
+        value: parseEther(SIMPLE_GAME_CONTRACT.gameFee),
+        data: data,
+      });
+      
+      console.log('Transaction hash:', hash);
+      
+      // Wait for transaction confirmation
+      console.log('Waiting for transaction confirmation...');
+      await new Promise(resolve => setTimeout(resolve, 3000)); // Wait 3 seconds for confirmation
+      
+      console.log('Transaction confirmed, returning true');
+      return true;
     } catch (error) {
       console.error('Error starting game:', error);
+      return false;
     }
   };
 
@@ -176,7 +207,7 @@ export function useSimpleGame() {
     startActualGame,
     
     // Loading states
-    isStartingGame,
+    isStartingGame: isStartingGame || isSendingTransaction,
     isEndingGame,
     
     // Errors

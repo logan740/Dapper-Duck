@@ -3,11 +3,14 @@
 import Script from "next/script";
 import { useEffect } from "react";
 import { RainbowWalletButton } from "@/components/rainbow-wallet-button";
+import { PayToPlayButton } from "@/components/pay-to-play-button";
+import { useSimpleGame } from "@/hooks/useSimpleGame";
 import Link from "next/link";
 import { useAccount } from "wagmi";
 
 export default function GamePage() {
   const { address } = useAccount();
+  const { endGame } = useSimpleGame();
 
   // Ensure full-viewport sizing for canvas and mobile optimization
   useEffect(() => {
@@ -81,6 +84,18 @@ export default function GamePage() {
     }
   }, [address]);
 
+  // Set up contract integration functions for the game
+  useEffect(() => {
+    if (typeof window !== 'undefined' && endGame) {
+      // Set the contract's endPaidGame function for the game to use
+      window.setEndPaidGameContract = (gameId, score) => {
+        console.log('Game calling contract endPaidGame:', gameId, score);
+        endGame(score);
+      };
+      console.log('Game page: Contract integration functions set up');
+    }
+  }, [endGame]);
+
   return (
     <div className="relative w-screen h-screen overflow-hidden touch-none select-none" style={{ height: '100vh' }}>
       {/* Game Canvas */}
@@ -125,13 +140,20 @@ export default function GamePage() {
               >
                 🆓 Free Game
               </button>
-                     <button
-                       id="paidGameBtn"
-                       disabled
-                       className="w-full rounded-xl bg-gray-400 cursor-not-allowed px-4 py-3 text-white font-bold shadow opacity-60"
-                     >
-                       💎 Pay 0.001 ETH (Coming Soon)
-                     </button>
+                     <PayToPlayButton 
+                       className="w-full"
+                       onGameStarted={(gameId) => {
+                         console.log('Game started with ID:', gameId);
+                         // Trigger the paid game in the game.js
+                         if (typeof window !== 'undefined' && (window as any).startPaidGame) {
+                           (window as any).startPaidGame(gameId);
+                         }
+                       }}
+                       onGameEnded={(score) => {
+                         console.log('Game ended with score:', score);
+                         // The game.js will handle the end game logic
+                       }}
+                     />
             </div>
           </div>
         </div>

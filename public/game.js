@@ -1588,6 +1588,59 @@
   window.distributeWeeklyRewards = distributeWeeklyRewards;
   window.trackPaidGameRevenue = trackPaidGameRevenue;
 
+  // Contract integration functions
+  let currentPaidGameId = null;
+  let isPaidGame = false;
+
+  // Function to start a paid game (called from React component)
+  window.startPaidGame = function(gameId) {
+    console.log('Starting paid game with ID:', gameId);
+    currentPaidGameId = gameId;
+    isPaidGame = true;
+    
+    // Start the game
+    setState(State.PLAY);
+    
+    // Hide the menu
+    const menu = document.getElementById('menu');
+    if (menu) {
+      menu.style.display = 'none';
+    }
+  };
+
+  // Function to end a paid game (called when game ends)
+  window.endPaidGame = function(score) {
+    if (isPaidGame && currentPaidGameId) {
+      console.log('Ending paid game with ID:', currentPaidGameId, 'Score:', score);
+      
+      // Call the contract's endPaidGame function
+      if (window.endPaidGameContract) {
+        window.endPaidGameContract(currentPaidGameId, score);
+      }
+      
+      // Reset paid game state
+      currentPaidGameId = null;
+      isPaidGame = false;
+    }
+  };
+
+  // Function to set the contract's endPaidGame function (called from React component)
+  window.setEndPaidGameContract = function(endGameFunction) {
+    window.endPaidGameContract = endGameFunction;
+  };
+
+  // Modify the game over logic to handle paid games
+  const originalGameOver = gameOver;
+  gameOver = function(reason) {
+    // Call original game over logic
+    originalGameOver(reason);
+    
+    // If this was a paid game, end it
+    if (isPaidGame && currentPaidGameId) {
+      window.endPaidGame(score);
+    }
+  };
+
   // Start the game
   console.log('Initializing game, setting state to MENU');
   setState(State.MENU);

@@ -88,7 +88,7 @@ export default function GamePage() {
   useEffect(() => {
     if (typeof window !== 'undefined' && endGame) {
       // Set the contract's endPaidGame function for the game to use
-      window.setEndPaidGameContract = (gameId, score) => {
+      (window as any).setEndPaidGameContract = (gameId: number, score: number) => {
         console.log('Game calling contract endPaidGame:', gameId, score);
         endGame(score);
       };

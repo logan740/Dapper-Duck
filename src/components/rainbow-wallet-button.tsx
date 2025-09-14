@@ -76,7 +76,6 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
         onClick={() => {
           console.log('🔥 META MASK BUTTON CLICKED 🔥');
           
-          // Simple direct connection without wagmi sync
           if (typeof window !== 'undefined' && (window as any).ethereum) {
             console.log('MetaMask detected, requesting accounts...');
             
@@ -84,9 +83,38 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
               method: 'eth_requestAccounts' 
             }).then((accounts: string[]) => {
               console.log('MetaMask connected successfully:', accounts);
-              alert('MetaMask connected: ' + accounts[0]);
-              // Force page refresh to update UI state
-              window.location.reload();
+              
+              // Now sync with wagmi to update UI state
+              console.log('Available connectors:', connectors.map(c => ({ name: c.name, id: c.id })));
+              
+              // Find MetaMask connector
+              const metaMaskConnector = connectors.find(connector => 
+                connector.name.toLowerCase().includes('metamask') ||
+                connector.id.toLowerCase().includes('metamask') ||
+                (connector.name.toLowerCase().includes('injected') && 
+                 !connector.name.toLowerCase().includes('abstract') &&
+                 !connector.name.toLowerCase().includes('privy') &&
+                 !connector.name.toLowerCase().includes('magic'))
+              );
+              
+              console.log('Found MetaMask connector:', metaMaskConnector?.name, metaMaskConnector?.id);
+              
+              if (metaMaskConnector) {
+                console.log('Syncing with wagmi...');
+                try {
+                  connect({ connector: metaMaskConnector });
+                  console.log('Successfully synced with wagmi!');
+                  alert('MetaMask connected and UI updated!');
+                } catch (syncError: any) {
+                  console.error('Wagmi sync failed:', syncError);
+                  alert('MetaMask connected but UI sync failed. Refreshing page...');
+                  window.location.reload();
+                }
+              } else {
+                console.log('No MetaMask connector found, refreshing page...');
+                alert('MetaMask connected but no connector found. Refreshing page...');
+                window.location.reload();
+              }
             }).catch((error: any) => {
               console.error('MetaMask connection failed:', error);
               alert('MetaMask connection failed: ' + error.message);

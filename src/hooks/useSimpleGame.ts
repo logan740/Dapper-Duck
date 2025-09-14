@@ -175,7 +175,7 @@ export function useSimpleGame() {
         to: SIMPLE_GAME_CONTRACT.address,
         value: parseEther(SIMPLE_GAME_CONTRACT.gameFee),
         data: data,
-        gas: 300000n, // Set reasonable gas limit (300k gas should be plenty for startPaidGame)
+        gas: 50000n, // Set very low gas limit (50k gas should be plenty for startPaidGame)
       });
       
       console.log('Transaction sent to MetaMask, waiting for confirmation...');

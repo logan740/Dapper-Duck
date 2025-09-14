@@ -30,6 +30,8 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
   // Debug wallet state
   console.log('RainbowWalletButton - Wallet state:', { isConnected, address, status });
   console.log('🔥 COMPONENT RENDERED 🔥');
+  console.log('🔥 COMPONENT RENDERED 🔥');
+  console.log('🔥 COMPONENT RENDERED 🔥');
 
   // If connected, show the standard ConnectButton
   if (isConnected) {
@@ -70,53 +72,12 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
       </Button>
       
       {/* MetaMask Button */}
-      <Button
-        onClick={async () => {
+      <button
+        onClick={() => {
           console.log('🔥 META MASK BUTTON CLICKED 🔥');
-          
-          try {
-            if (typeof window !== 'undefined' && (window as any).ethereum) {
-              console.log('MetaMask detected, requesting accounts...');
-              
-              // Request account access
-              const accounts = await (window as any).ethereum.request({ 
-                method: 'eth_requestAccounts' 
-              });
-              console.log('MetaMask connected successfully:', accounts);
-              
-              // Try to sync with wagmi
-              console.log('Available connectors:', connectors.map(c => ({ name: c.name, id: c.id })));
-              
-              // Find MetaMask connector
-              const metaMaskConnector = connectors.find(connector => 
-                connector.name.toLowerCase().includes('metamask') ||
-                connector.id.toLowerCase().includes('metamask') ||
-                (connector.name.toLowerCase().includes('injected') && 
-                 !connector.name.toLowerCase().includes('abstract') &&
-                 !connector.name.toLowerCase().includes('privy') &&
-                 !connector.name.toLowerCase().includes('magic'))
-              );
-              
-              console.log('Found MetaMask connector:', metaMaskConnector?.name, metaMaskConnector?.id);
-              
-              if (metaMaskConnector) {
-                console.log('Connecting through wagmi...');
-                await connect({ connector: metaMaskConnector });
-                console.log('Successfully connected through wagmi!');
-                alert('MetaMask connected and UI updated!');
-              } else {
-                console.log('No MetaMask connector found, refreshing page...');
-                window.location.reload();
-              }
-              
-            } else {
-              console.log('MetaMask not detected');
-              alert('MetaMask not detected. Please install MetaMask extension.');
-            }
-          } catch (error) {
-            console.error('MetaMask connection failed:', error);
-            alert('MetaMask connection failed: ' + (error as Error).message);
-          }
+          console.log('🔥 META MASK BUTTON CLICKED 🔥');
+          console.log('🔥 META MASK BUTTON CLICKED 🔥');
+          alert('MetaMask button clicked - check console!');
         }}
         onMouseDown={() => {
           console.log('🖱️ META MASK BUTTON MOUSE DOWN 🖱️');
@@ -130,11 +91,18 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
         onTouchEnd={() => {
           console.log('👆 META MASK BUTTON TOUCH END 👆');
         }}
-        className="cursor-pointer group min-w-32"
+        style={{
+          backgroundColor: 'red',
+          color: 'white',
+          padding: '10px 20px',
+          border: 'none',
+          borderRadius: '5px',
+          cursor: 'pointer',
+          fontSize: '16px'
+        }}
       >
-        <MetaMaskIcon className="mr-2 h-4 w-4 group-hover:animate-spin transition-transform" />
-        MetaMask
-      </Button>
+        🔥 META MASK 🔥
+      </button>
     </div>
   );
 }

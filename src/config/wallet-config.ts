@@ -11,7 +11,7 @@ import { abstractTestnet } from 'viem/chains';
  */
 export const config = getDefaultConfig({
   appName: 'Dapper Duck',
-  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'your-project-id',
+  projectId: 'dapper-duck-app', // Simple project ID to avoid WalletConnect issues
   chains: [abstractTestnet],
   ssr: false,
 });

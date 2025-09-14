@@ -184,7 +184,7 @@
       BOTTOM_DEAD_ZONE = innerDeadZone;
     } else if (!isMobile && !isTablet) {
       // Desktop: Use smaller death zones for larger play area - UPDATED
-      const desktopDeadZone = Math.max(35, virtualDeadZone - 35);
+      const desktopDeadZone = Math.max(50, virtualDeadZone - 50);
       TOP_DEAD_ZONE = desktopDeadZone;
       BOTTOM_DEAD_ZONE = desktopDeadZone;
     } else {

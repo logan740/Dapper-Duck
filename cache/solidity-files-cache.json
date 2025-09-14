@@ -183,6 +183,78 @@
       "artifacts": [
         "Context"
       ]
+    },
+    "C:\\Users\\logan\\Downloads\\dapper-duck-web\\contracts\\DapperDuckSimple.sol": {
+      "lastModificationDate": 1757749208769,
+      "contentHash": "9c07c04b1f2f46acbaa8cbbb537bb3db",
+      "sourceName": "contracts/DapperDuckSimple.sol",
+      "solcConfig": {
+        "version": "0.8.19",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/access/Ownable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.19"
+      ],
+      "artifacts": [
+        "DapperDuckSimple"
+      ]
+    },
+    "C:\\Users\\logan\\Downloads\\dapper-duck-web\\contracts\\SimpleGame.sol": {
+      "lastModificationDate": 1757749208769,
+      "contentHash": "35725041bb6dedae65650c2a85e07dda",
+      "sourceName": "contracts/SimpleGame.sol",
+      "solcConfig": {
+        "version": "0.8.19",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.19"
+      ],
+      "artifacts": [
+        "SimpleGame"
+      ]
     }
   }
 }

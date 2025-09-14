@@ -1,0 +1,5 @@
+.exit
+node check-balance.js
+npx hardhat run deploy-working.js --network abstract
+node -e "const { ethers } = require('hardhat'); require('dotenv').config(); (async () => { const [deployer] = await ethers.getSigners(); console.log('Address:', deployer.address); const balance = await deployer.provider.getBalance(deployer.address); console.log('Balance:', ethers.formatEther(balance), 'ETH'); })()"
+npx hardhat run deploy-working.js --network abstract

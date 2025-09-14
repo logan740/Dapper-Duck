@@ -1,0 +1,146 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "SimpleGame",
+  "sourceName": "contracts/SimpleGame.sol",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "player",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "gameId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "score",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        }
+      ],
+      "name": "GameCompleted",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "player",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "gameId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "timestamp",
+          "type": "uint256"
+        }
+      ],
+      "name": "GameStarted",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "GAME_FEE",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_gameId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_score",
+          "type": "uint256"
+        }
+      ],
+      "name": "endPaidGame",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "gameCounter",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getStats",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "_totalGames",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_contractBalance",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "startPaidGame",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "stateMutability": "payable",
+      "type": "receive"
+    }
+  ],
+  "bytecode": "0x608060405234801561001057600080fd5b5061029f806100206000396000f3fe60806040526004361061004e5760003560e01c80631001333a1461005a5780632e0be39a14610088578063425b92d11461009e5780635e3f7541146100c0578063c59d4847146100c857600080fd5b3661005557005b600080fd5b34801561006657600080fd5b5061007566038d7ea4c6800081565b6040519081526020015b60405180910390f35b34801561009457600080fd5b5061007560005481565b3480156100aa57600080fd5b506100be6100b9366004610220565b6100eb565b005b610075610180565b3480156100d457600080fd5b50600054604080519182524760208301520161007f565b6000821180156100fd57506000548211155b6101405760405162461bcd60e51b815260206004820152600f60248201526e125b9d985b1a590819d85b59481251608a1b60448201526064015b60405180910390fd5b60408051828152426020820152839133917f02bc913790ab631ec32c90d78f72b9b8ef68289c2dcd586f7da9c36b244a2ed4910160405180910390a35050565b600066038d7ea4c6800034146101cd5760405162461bcd60e51b8152602060048201526012602482015271496e636f72726563742067616d652066656560701b6044820152606401610137565b6000805490806101dc83610242565b9091555050600054604051428152819033907f2ebc740a82c0c6454a29c8aa9db57c66257e2f17d38a783c83c83dd49f52e0fb9060200160405180910390a3919050565b6000806040838503121561023357600080fd5b50508035926020909101359150565b60006001820161026257634e487b7160e01b600052601160045260246000fd5b506001019056fea2646970667358221220754e51dccfdc93f2d5d88722515ef948e9fb61e021bdf0d4b7b1b35ba6bb668164736f6c63430008130033",
+  "deployedBytecode": "0x60806040526004361061004e5760003560e01c80631001333a1461005a5780632e0be39a14610088578063425b92d11461009e5780635e3f7541146100c0578063c59d4847146100c857600080fd5b3661005557005b600080fd5b34801561006657600080fd5b5061007566038d7ea4c6800081565b6040519081526020015b60405180910390f35b34801561009457600080fd5b5061007560005481565b3480156100aa57600080fd5b506100be6100b9366004610220565b6100eb565b005b610075610180565b3480156100d457600080fd5b50600054604080519182524760208301520161007f565b6000821180156100fd57506000548211155b6101405760405162461bcd60e51b815260206004820152600f60248201526e125b9d985b1a590819d85b59481251608a1b60448201526064015b60405180910390fd5b60408051828152426020820152839133917f02bc913790ab631ec32c90d78f72b9b8ef68289c2dcd586f7da9c36b244a2ed4910160405180910390a35050565b600066038d7ea4c6800034146101cd5760405162461bcd60e51b8152602060048201526012602482015271496e636f72726563742067616d652066656560701b6044820152606401610137565b6000805490806101dc83610242565b9091555050600054604051428152819033907f2ebc740a82c0c6454a29c8aa9db57c66257e2f17d38a783c83c83dd49f52e0fb9060200160405180910390a3919050565b6000806040838503121561023357600080fd5b50508035926020909101359150565b60006001820161026257634e487b7160e01b600052601160045260246000fd5b506001019056fea2646970667358221220754e51dccfdc93f2d5d88722515ef948e9fb61e021bdf0d4b7b1b35ba6bb668164736f6c63430008130033",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

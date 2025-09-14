@@ -26,8 +26,8 @@ module.exports = {
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : []
     },
     abstractMainnet: {
-      url: "https://api.abs.xyz", // Abstract mainnet
-      chainId: 11124, // Abstract mainnet chain ID
+      url: "https://api.mainnet.abs.xyz", // Abstract mainnet
+      chainId: 2741, // Abstract mainnet chain ID
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : []
     }
   },

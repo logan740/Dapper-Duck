@@ -1,9 +1,10 @@
 "use client";
 
 // Removed ConnectButton import - using custom connected state display
-import { useLoginWithAbstract } from '@abstract-foundation/agw-react';
+// Temporarily removed Abstract imports for MetaMask-only testing
+// import { useLoginWithAbstract } from '@abstract-foundation/agw-react';
 import { useAccount, useConnect, useDisconnect } from 'wagmi';
-import { Button } from '@/components/ui/button';
+// import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { type ClassValue } from 'clsx';
 import { useState } from 'react';
@@ -25,7 +26,8 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
   const { isConnected, address, status } = useAccount();
   const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect();
-  const { login } = useLoginWithAbstract();
+  // Temporarily removed Abstract login for MetaMask-only testing
+  // const { login } = useLoginWithAbstract();
   const [isConnecting, setIsConnecting] = useState(false);
 
   // Function to connect to MetaMask
@@ -122,8 +124,8 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
   // If not connected, show custom wallet selection
   return (
     <div className={cn("flex space-x-2", className)}>
-      {/* Abstract AGW Button */}
-      <Button
+      {/* Temporarily remove Abstract button to focus on MetaMask for contract testing */}
+      {/* <Button
         onClick={async () => {
           setIsConnecting(true);
           try {
@@ -139,7 +141,7 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
       >
         <AbstractLogo className="mr-2 h-4 w-4 group-hover:animate-spin transition-transform" />
         {isConnecting ? 'Connecting...' : 'Abstract'}
-      </Button>
+      </Button> */}
       
       {/* MetaMask Button */}
       <button

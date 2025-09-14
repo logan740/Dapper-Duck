@@ -2,7 +2,8 @@
 
 import { WagmiProvider } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AbstractWalletProvider } from '@abstract-foundation/agw-react';
+// Temporarily removed Abstract imports for MetaMask-only testing
+// import { AbstractWalletProvider } from '@abstract-foundation/agw-react';
 import { config, chain } from '@/config/wallet-config';
 import { useState } from 'react';
 
@@ -31,9 +32,10 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        <AbstractWalletProvider chain={chain}>
+        {/* Temporarily remove AbstractWalletProvider to focus on MetaMask for contract testing */}
+        {/* <AbstractWalletProvider chain={chain}> */}
           {children}
-        </AbstractWalletProvider>
+        {/* </AbstractWalletProvider> */}
       </QueryClientProvider>
     </WagmiProvider>
   );

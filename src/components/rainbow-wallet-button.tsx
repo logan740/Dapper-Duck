@@ -2,7 +2,7 @@
 
 // Removed ConnectButton import - using custom connected state display
 import { useLoginWithAbstract } from '@abstract-foundation/agw-react';
-import { useAccount, useConnect } from 'wagmi';
+import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { type ClassValue } from 'clsx';
@@ -24,8 +24,68 @@ interface RainbowWalletButtonProps {
 export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
   const { isConnected, address, status } = useAccount();
   const { connect, connectors } = useConnect();
+  const { disconnect } = useDisconnect();
   const { login } = useLoginWithAbstract();
   const [isConnecting, setIsConnecting] = useState(false);
+
+  // Function to connect to MetaMask
+  const connectToMetaMask = () => {
+    console.log('Available connectors:', connectors.map(c => ({ name: c.name, id: c.id })));
+    
+    // Debug: Log each connector individually
+    connectors.forEach((connector, index) => {
+      console.log(`Connector ${index}:`, {
+        name: connector.name,
+        id: connector.id,
+        type: connector.type
+      });
+    });
+    
+    // Find MetaMask connector first - try multiple approaches
+    let metaMaskConnector = connectors.find(connector => 
+      connector.name.toLowerCase().includes('metamask') ||
+      connector.id.toLowerCase().includes('metamask')
+    );
+    
+    // If not found by name/id, try injected connector
+    if (!metaMaskConnector) {
+      metaMaskConnector = connectors.find(connector => 
+        connector.name.toLowerCase().includes('injected') && 
+        !connector.name.toLowerCase().includes('abstract') &&
+        !connector.name.toLowerCase().includes('privy') &&
+        !connector.name.toLowerCase().includes('magic')
+      );
+    }
+    
+    // If still not found, try any connector that's not Abstract/Privy/Magic
+    if (!metaMaskConnector) {
+      metaMaskConnector = connectors.find(connector => 
+        !connector.name.toLowerCase().includes('abstract') &&
+        !connector.name.toLowerCase().includes('privy') &&
+        !connector.name.toLowerCase().includes('magic')
+      );
+    }
+    
+    console.log('Found MetaMask connector:', metaMaskConnector?.name, metaMaskConnector?.id);
+    
+    if (metaMaskConnector) {
+      console.log('Connecting through wagmi...');
+      setIsConnecting(true);
+      try {
+        connect({ connector: metaMaskConnector });
+        console.log('Successfully connected through wagmi!');
+        alert('MetaMask connected and UI updated!');
+      } catch (error: any) {
+        console.error('Wagmi connection failed:', error);
+        alert('MetaMask connection failed: ' + error.message);
+      } finally {
+        setIsConnecting(false);
+      }
+    } else {
+      console.log('No MetaMask connector found');
+      alert('MetaMask connector not found. Please ensure MetaMask is installed.');
+    }
+  };
 
   // Debug wallet state
   console.log('RainbowWalletButton - Wallet state:', { isConnected, address, status });
@@ -46,6 +106,15 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
         <div className="text-xs text-gray-600 dark:text-gray-400 font-mono">
           {address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'Unknown'}
         </div>
+        <button
+          onClick={() => {
+            console.log('Disconnecting wallet...');
+            disconnect();
+          }}
+          className="px-2 py-1 text-xs bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 rounded hover:bg-red-200 dark:hover:bg-red-800 transition-colors"
+        >
+          Disconnect
+        </button>
       </div>
     );
   }
@@ -53,8 +122,8 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
   // If not connected, show custom wallet selection
   return (
     <div className={cn("flex space-x-2", className)}>
-      {/* Temporarily disable Abstract button to test MetaMask */}
-      {/* <Button
+      {/* Abstract AGW Button */}
+      <Button
         onClick={async () => {
           setIsConnecting(true);
           try {
@@ -70,67 +139,23 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
       >
         <AbstractLogo className="mr-2 h-4 w-4 group-hover:animate-spin transition-transform" />
         {isConnecting ? 'Connecting...' : 'Abstract'}
-      </Button> */}
+      </Button>
       
       {/* MetaMask Button */}
       <button
         onClick={() => {
           console.log('🔥 META MASK BUTTON CLICKED 🔥');
           
-          console.log('Available connectors:', connectors.map(c => ({ name: c.name, id: c.id })));
-          
-          // Debug: Log each connector individually
-          connectors.forEach((connector, index) => {
-            console.log(`Connector ${index}:`, {
-              name: connector.name,
-              id: connector.id,
-              type: connector.type
-            });
-          });
-          
-          // Find MetaMask connector first - try multiple approaches
-          let metaMaskConnector = connectors.find(connector => 
-            connector.name.toLowerCase().includes('metamask') ||
-            connector.id.toLowerCase().includes('metamask')
-          );
-          
-          // If not found by name/id, try injected connector
-          if (!metaMaskConnector) {
-            metaMaskConnector = connectors.find(connector => 
-              connector.name.toLowerCase().includes('injected') && 
-              !connector.name.toLowerCase().includes('abstract') &&
-              !connector.name.toLowerCase().includes('privy') &&
-              !connector.name.toLowerCase().includes('magic')
-            );
-          }
-          
-          // If still not found, try any connector that's not Abstract/Privy/Magic
-          if (!metaMaskConnector) {
-            metaMaskConnector = connectors.find(connector => 
-              !connector.name.toLowerCase().includes('abstract') &&
-              !connector.name.toLowerCase().includes('privy') &&
-              !connector.name.toLowerCase().includes('magic')
-            );
-          }
-          
-          console.log('Found MetaMask connector:', metaMaskConnector?.name, metaMaskConnector?.id);
-          
-          if (metaMaskConnector) {
-            console.log('Connecting through wagmi...');
-            setIsConnecting(true);
-            try {
-              connect({ connector: metaMaskConnector });
-              console.log('Successfully connected through wagmi!');
-              alert('MetaMask connected and UI updated!');
-            } catch (error: any) {
-              console.error('Wagmi connection failed:', error);
-              alert('MetaMask connection failed: ' + error.message);
-            } finally {
-              setIsConnecting(false);
-            }
+          // First disconnect any existing connection to force fresh connection
+          if (isConnected) {
+            console.log('Disconnecting existing wallet first...');
+            disconnect();
+            // Wait a moment for disconnect to complete
+            setTimeout(() => {
+              connectToMetaMask();
+            }, 500);
           } else {
-            console.log('No MetaMask connector found');
-            alert('MetaMask connector not found. Please ensure MetaMask is installed.');
+            connectToMetaMask();
           }
         }}
         onMouseDown={() => {

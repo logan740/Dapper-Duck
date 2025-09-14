@@ -1,7 +1,7 @@
 // Contract configuration for DapperDuck Full Contract
 export const SIMPLE_GAME_CONTRACT = {
-  // Deployed contract address on Abstract Testnet (Full DapperDuck Contract)
-  address: '0x5FbDB2315678afecb367f032d93F642f64180aa3' as const,
+  // Deployed contract address on Abstract Testnet (Full DapperDuck Contract with Withdrawal Functions)
+  address: '0x764fEC2E554fD3a85e7d4f0D0CC78C74259580Da' as const,
   
   // Contract ABI (Application Binary Interface) - DapperDuck Full Contract
   abi: [

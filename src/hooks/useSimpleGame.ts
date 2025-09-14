@@ -189,20 +189,25 @@ export function useSimpleGame() {
   };
 
   const endGame = async (score: number) => {
-    if (!endWriteContract || !currentGameId) {
-      console.error('endWriteContract function not available or no active game');
-      return;
-    }
+    // End game function is now optional - no transaction required
+    // The game is already paid for, no need for additional blockchain transaction
+    console.log('Game ended with score:', score);
+    setIsGameActive(false);
+    setCurrentGameId(null);
     
-    try {
-      await endWriteContract({
-        address: SIMPLE_GAME_CONTRACT.address,
-        abi: SIMPLE_GAME_CONTRACT.abi,
-        functionName: 'endPaidGame',
-        args: [BigInt(currentGameId), BigInt(score), true], // true = won (score > 0)
-      });
-    } catch (error) {
-      console.error('Error ending game:', error);
+    // Optional: You can call the contract if you want to track scores on-chain
+    // But this should be user-initiated, not automatic
+    if (false && endWriteContract && currentGameId) {
+      try {
+        await endWriteContract({
+          address: SIMPLE_GAME_CONTRACT.address,
+          abi: SIMPLE_GAME_CONTRACT.abi,
+          functionName: 'endPaidGame',
+          args: [BigInt(currentGameId), BigInt(score), true], // true = won (score > 0)
+        });
+      } catch (error) {
+        console.error('Error ending game:', error);
+      }
     }
   };
 

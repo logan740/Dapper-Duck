@@ -71,92 +71,67 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
       {/* MetaMask Button */}
       <Button
         onClick={async () => {
-          console.log('=== MetaMask Connection Debug ===');
-          console.log('Available connectors:', connectors.map(c => ({ name: c.name, id: c.id, type: c.type })));
-          console.log('Full connector details:', connectors);
+          console.log('=== MetaMask Direct Connection ===');
           
-          // Check if MetaMask is specifically available
+          // Check if MetaMask is available
           const isMetaMaskInstalled = typeof window !== 'undefined' && 
             (window as any).ethereum && 
             (window as any).ethereum.isMetaMask;
           
-          console.log('MetaMask installed:', isMetaMaskInstalled);
-          console.log('window.ethereum:', (window as any).ethereum);
-          
-          // Find MetaMask connector specifically (exclude Abstract)
-          let metaMaskConnector = connectors.find(c => 
-            (c.name.toLowerCase() === 'metamask' || 
-             c.id.toLowerCase() === 'metamask' ||
-             (c.name.toLowerCase().includes('metamask') && !c.name.toLowerCase().includes('magic'))) &&
-            !c.name.toLowerCase().includes('abstract') &&
-            !c.id.toLowerCase().includes('abstract') &&
-            !c.id.toLowerCase().includes('privy')
-          );
-          
-          console.log('Found MetaMask connector:', metaMaskConnector);
-          
-          // If MetaMask connector found, use it
-          if (metaMaskConnector) {
-            try {
-              console.log(`Attempting to connect with MetaMask: ${metaMaskConnector.name} (${metaMaskConnector.id})`);
-              await connect({ connector: metaMaskConnector });
-              console.log(`Successfully connected with MetaMask!`);
-              return;
-            } catch (error) {
-              console.log(`Failed to connect with MetaMask:`, error instanceof Error ? error.message : String(error));
-            }
+          if (!isMetaMaskInstalled) {
+            alert('MetaMask not found. Please install MetaMask extension.');
+            return;
           }
           
-          // If no MetaMask connector found, try injected connector (but verify it's MetaMask)
-          const injectedConnector = connectors.find(c => 
-            (c.id === 'injected' || c.name.toLowerCase().includes('injected')) &&
-            !c.name.toLowerCase().includes('abstract') &&
-            !c.id.toLowerCase().includes('abstract')
-          );
-          
-          if (injectedConnector && isMetaMaskInstalled) {
+          try {
+            console.log('Attempting direct MetaMask connection...');
+            
+            // Request account access
+            const accounts = await (window as any).ethereum.request({ 
+              method: 'eth_requestAccounts' 
+            });
+            
+            console.log('MetaMask connected successfully:', accounts);
+            
+            // Request to switch to Abstract testnet
             try {
-              console.log(`Attempting to connect with injected connector: ${injectedConnector.name} (${injectedConnector.id})`);
-              await connect({ connector: injectedConnector });
-              console.log(`Successfully connected with injected connector!`);
-              return;
-            } catch (error) {
-              console.log(`Failed to connect with injected connector:`, error instanceof Error ? error.message : String(error));
-            }
-          }
-          
-          // If no connector worked, try direct connection
-          if (isMetaMaskInstalled) {
-            try {
-              console.log('All connectors failed, trying direct MetaMask connection...');
-              const accounts = await (window as any).ethereum.request({ 
-                method: 'eth_requestAccounts' 
+              await (window as any).ethereum.request({
+                method: 'wallet_switchEthereumChain',
+                params: [{ chainId: '0x1A4' }], // Abstract testnet chain ID
               });
-              console.log('Direct MetaMask connection successful:', accounts);
-              
-              // Try to force wagmi to recognize the connection by trying all connectors again
-              console.log('Attempting to sync wagmi state after direct connection...');
-              for (const connector of connectors) {
-                try {
-                  // Try to connect without user interaction (should work if already connected)
-                  await connect({ connector });
-                  console.log(`Successfully synced wagmi state with ${connector.name}!`);
-                  return;
-                } catch (error) {
-                  console.log(`Failed to sync with ${connector.name}:`, error instanceof Error ? error.message : String(error));
-                }
+              console.log('Switched to Abstract testnet');
+            } catch (switchError) {
+              console.log('Failed to switch to Abstract testnet:', switchError);
+              // Try to add the chain if it doesn't exist
+              try {
+                await (window as any).ethereum.request({
+                  method: 'wallet_addEthereumChain',
+                  params: [{
+                    chainId: '0x1A4',
+                    chainName: 'Abstract Testnet',
+                    nativeCurrency: {
+                      name: 'Ether',
+                      symbol: 'ETH',
+                      decimals: 18,
+                    },
+                    rpcUrls: ['https://api.testnet.abs.xyz'],
+                    blockExplorerUrls: ['https://testnet.abs.xyz'],
+                  }],
+                });
+                console.log('Added Abstract testnet');
+              } catch (addError) {
+                console.log('Failed to add Abstract testnet:', addError);
               }
-              
-              alert('MetaMask connected directly but UI may not update. Please refresh the page.');
-              return;
-            } catch (error) {
-              console.error('Direct MetaMask connection failed:', error);
             }
+            
+            // Force page refresh to update UI state
+            console.log('Refreshing page to update UI state...');
+            window.location.reload();
+            
+          } catch (error) {
+            console.error('MetaMask connection failed:', error);
+            alert('Failed to connect to MetaMask. Please try again.');
           }
-          
-          // If we get here, nothing worked
-          console.error('All connection methods failed');
-          alert('Unable to connect to MetaMask. Please check your browser extensions.');
         }}
         className="cursor-pointer group min-w-32"
       >

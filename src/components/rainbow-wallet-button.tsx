@@ -76,44 +76,36 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
       try {
         connect({ connector: metaMaskConnector });
         console.log('Successfully connected through wagmi!');
-        alert('MetaMask connected and UI updated!');
       } catch (error: any) {
         console.error('Wagmi connection failed:', error);
-        alert('MetaMask connection failed: ' + error.message);
       } finally {
         setIsConnecting(false);
       }
     } else {
       console.log('No MetaMask connector found');
-      alert('MetaMask connector not found. Please ensure MetaMask is installed.');
+      console.error('MetaMask connector not found. Please ensure MetaMask is installed.');
     }
   };
 
-  // Debug wallet state
+  // Debug wallet state (reduced logging)
   console.log('RainbowWalletButton - Wallet state:', { isConnected, address, status });
-  console.log('🔥 COMPONENT RENDERED 🔥');
-  console.log('🔥 COMPONENT RENDERED 🔥');
-  console.log('🔥 COMPONENT RENDERED 🔥');
 
-  // If connected, show custom connected state
+  // If connected, show clean connected state (no "Connected" text, just address)
   if (isConnected) {
     return (
-      <div className={cn("flex items-center space-x-2", className)}>
-        <div className="flex items-center space-x-2 px-3 py-2 bg-green-100 dark:bg-green-900 rounded-lg">
+      <div className={cn("flex items-center space-x-3", className)}>
+        <div className="flex items-center space-x-2 px-4 py-2 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
           <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-          <span className="text-sm font-medium text-green-800 dark:text-green-200">
-            Connected
+          <span className="text-sm font-mono text-gray-700 dark:text-gray-300">
+            {address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'Unknown'}
           </span>
-        </div>
-        <div className="text-xs text-gray-600 dark:text-gray-400 font-mono">
-          {address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'Unknown'}
         </div>
         <button
           onClick={() => {
             console.log('Disconnecting wallet...');
             disconnect();
           }}
-          className="px-2 py-1 text-xs bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 rounded hover:bg-red-200 dark:hover:bg-red-800 transition-colors"
+          className="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
         >
           Disconnect
         </button>
@@ -143,10 +135,10 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
         {isConnecting ? 'Connecting...' : 'Abstract'}
       </Button> */}
       
-      {/* MetaMask Button */}
+      {/* Clean MetaMask Button */}
       <button
         onClick={() => {
-          console.log('🔥 META MASK BUTTON CLICKED 🔥');
+          console.log('MetaMask button clicked');
           
           // First disconnect any existing connection to force fresh connection
           if (isConnected) {
@@ -160,29 +152,13 @@ export function RainbowWalletButton({ className }: RainbowWalletButtonProps) {
             connectToMetaMask();
           }
         }}
-        onMouseDown={() => {
-          console.log('🖱️ META MASK BUTTON MOUSE DOWN 🖱️');
-        }}
-        onMouseUp={() => {
-          console.log('🖱️ META MASK BUTTON MOUSE UP 🖱️');
-        }}
-        onTouchStart={() => {
-          console.log('👆 META MASK BUTTON TOUCH START 👆');
-        }}
-        onTouchEnd={() => {
-          console.log('👆 META MASK BUTTON TOUCH END 👆');
-        }}
-        style={{
-          backgroundColor: 'red',
-          color: 'white',
-          padding: '10px 20px',
-          border: 'none',
-          borderRadius: '5px',
-          cursor: 'pointer',
-          fontSize: '16px'
-        }}
+        disabled={isConnecting}
+        className="flex items-center space-x-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        🔥 META MASK 🔥
+        <MetaMaskIcon className="w-5 h-5" />
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          {isConnecting ? 'Connecting...' : 'Connect Wallet'}
+        </span>
       </button>
     </div>
   );

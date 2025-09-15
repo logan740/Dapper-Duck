@@ -190,14 +190,37 @@ export function useSimpleGame() {
   };
 
   const endGame = async (score: number) => {
-    // End game function is now optional - no transaction required
-    // The game is already paid for, no need for additional blockchain transaction
     console.log('Game ended with score:', score);
     setIsGameActive(false);
-    setCurrentGameId(null);
     
-    // Note: Contract end game functionality removed to prevent unnecessary MetaMask popups
-    // The game is already paid for when started, no additional transaction needed
+    // If this was a paid game and we have a score, record it to the leaderboard
+    if (currentGameId && score > 0) {
+      console.log('Recording paid game score to leaderboard...');
+      
+      // Ask user if they want to record their score to the leaderboard
+      const recordScore = window.confirm(
+        `Great score: ${score}!\n\n` +
+        'Would you like to record this score to the leaderboard?\n\n' +
+        'This requires a small transaction to save your score on-chain.'
+      );
+      
+      if (recordScore && endWriteContract) {
+        try {
+          await endWriteContract({
+            address: SIMPLE_GAME_CONTRACT.address,
+            abi: SIMPLE_GAME_CONTRACT.abi,
+            functionName: 'endPaidGame',
+            args: [BigInt(currentGameId), BigInt(score), true], // true = won (score > 0)
+          });
+          console.log('Score recorded to leaderboard successfully!');
+        } catch (error) {
+          console.error('Failed to record score:', error);
+          // Don't show error to user - just log it
+        }
+      }
+    }
+    
+    setCurrentGameId(null);
   };
 
   const startActualGame = () => {

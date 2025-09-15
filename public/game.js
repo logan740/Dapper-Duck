@@ -1720,12 +1720,14 @@
     // Call original game over logic
     originalGameOver(reason);
     
-    // If this was a paid game, end it with contract (optional - no transaction required)
+    // If this was a paid game, call the React endGame function to record score
     if (isPaidGame && currentPaidGameId) {
-      console.log('Paid game ended, tracking completion...');
-      // Don't call contract - just track locally
-      // The game is already paid for, no need for additional transaction
-      console.log('Game completed with score:', score);
+      console.log('Paid game ended, calling React endGame function...');
+      if (typeof window.endPaidGameFromReact === 'function') {
+        window.endPaidGameFromReact(currentPaidGameId, score);
+      } else {
+        console.log('React endGame function not available');
+      }
     }
   };
 

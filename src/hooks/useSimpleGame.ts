@@ -45,9 +45,10 @@ export function useSimpleGame() {
   // Contract writes
   const { writeContract: writeContract, isPending: isStartingGame, error: startGameError } = useWriteContract({
     mutation: {
-      onSuccess: (data) => {
-        console.log('Transaction sent successfully:', data);
-        // Don't automatically start the game - wait for user to click "Start Game"
+      onSuccess: (hash) => {
+        console.log('Transaction sent successfully:', hash);
+        setTransactionHash(hash);
+        // Don't automatically start the game - wait for transaction confirmation
       },
       onError: (error) => {
         console.error('Failed to send transaction:', error);

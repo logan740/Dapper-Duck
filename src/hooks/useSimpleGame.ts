@@ -162,7 +162,7 @@ export function useSimpleGame() {
         abi: SIMPLE_GAME_CONTRACT.abi,
         functionName: 'startPaidGame',
         value: parseEther(SIMPLE_GAME_CONTRACT.gameFee),
-        gas: BigInt(300000), // Set reasonable gas limit for startPaidGame
+        // Let MetaMask auto-estimate gas for better compatibility
       });
       
       console.log('Transaction sent to MetaMask, waiting for confirmation...');

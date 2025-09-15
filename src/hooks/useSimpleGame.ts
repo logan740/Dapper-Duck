@@ -211,6 +211,7 @@ export function useSimpleGame() {
             abi: SIMPLE_GAME_CONTRACT.abi,
             functionName: 'endPaidGame',
             args: [BigInt(currentGameId), BigInt(score), true], // true = won (score > 0)
+            gas: BigInt(200000), // Reasonable gas limit for endPaidGame
           });
           console.log('Score recorded to leaderboard successfully!');
         } catch (error) {

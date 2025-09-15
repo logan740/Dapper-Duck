@@ -1,5 +1,5 @@
-import { useReadContract, useWriteContract, useWatchContractEvent, useSendTransaction, useWaitForTransactionReceipt } from 'wagmi';
-import { parseEther, encodeFunctionData } from 'viem';
+import { useReadContract, useWriteContract, useWatchContractEvent, useWaitForTransactionReceipt } from 'wagmi';
+import { parseEther } from 'viem';
 import { SIMPLE_GAME_CONTRACT } from '@/config/contract-config';
 import { useState, useEffect } from 'react';
 
@@ -56,19 +56,7 @@ export function useSimpleGame() {
     },
   });
 
-  // Send transaction hook for better control
-  const { sendTransaction, isPending: isSendingTransaction, error: sendError } = useSendTransaction({
-    mutation: {
-      onSuccess: (hash) => {
-        console.log('Transaction sent successfully:', hash);
-        setTransactionHash(hash);
-        // Don't set game active here - wait for confirmation
-      },
-      onError: (error) => {
-        console.error('Failed to send transaction:', error);
-      },
-    },
-  });
+  // Remove sendTransaction hook since we're using direct contract calls
 
   // Wait for transaction receipt with multiple confirmations
   const { data: receipt, isSuccess: isTransactionSuccess } = useWaitForTransactionReceipt({
@@ -142,8 +130,8 @@ export function useSimpleGame() {
 
   // Helper functions
   const startGame = async () => {
-    if (!sendTransaction) {
-      console.error('sendTransaction function not available');
+    if (!writeContract) {
+      console.error('writeContract function not available');
       return false;
     }
     
@@ -164,17 +152,16 @@ export function useSimpleGame() {
         return false;
       }
       
-      // Encode the function call
-      const data = encodeFunctionData({
+      // Use the contract's direct method instead of sendTransaction
+      if (!writeContract) {
+        throw new Error('Contract write function not available');
+      }
+      
+      await writeContract({
+        address: SIMPLE_GAME_CONTRACT.address,
         abi: SIMPLE_GAME_CONTRACT.abi,
         functionName: 'startPaidGame',
-      });
-      
-      // Send the transaction with reasonable gas limit
-      sendTransaction({
-        to: SIMPLE_GAME_CONTRACT.address,
         value: parseEther(SIMPLE_GAME_CONTRACT.gameFee),
-        data: data,
         gas: BigInt(300000), // Set reasonable gas limit for startPaidGame
       });
       
@@ -265,7 +252,7 @@ export function useSimpleGame() {
     startActualGame,
     
     // Loading states
-    isStartingGame: isStartingGame || isSendingTransaction,
+    isStartingGame: isStartingGame,
     isEndingGame,
     
     // Errors

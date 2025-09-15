@@ -170,12 +170,12 @@ export function useSimpleGame() {
         functionName: 'startPaidGame',
       });
       
-      // Send the transaction - let MetaMask handle gas estimation
+      // Send the transaction with reasonable gas limit
       sendTransaction({
         to: SIMPLE_GAME_CONTRACT.address,
         value: parseEther(SIMPLE_GAME_CONTRACT.gameFee),
         data: data,
-        // Remove gas settings - let MetaMask estimate automatically
+        gas: BigInt(300000), // Set reasonable gas limit for startPaidGame
       });
       
       console.log('Transaction sent to MetaMask, waiting for confirmation...');

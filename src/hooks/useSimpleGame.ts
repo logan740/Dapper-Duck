@@ -1,5 +1,5 @@
-import { useReadContract, useWriteContract, useWatchContractEvent, useWaitForTransactionReceipt } from 'wagmi';
-import { parseEther } from 'viem';
+import { useReadContract, useWriteContract, useWatchContractEvent, useWaitForTransactionReceipt, useSendTransaction } from 'wagmi';
+import { parseEther, encodeFunctionData } from 'viem';
 import { SIMPLE_GAME_CONTRACT } from '@/config/contract-config';
 import { useState, useEffect } from 'react';
 
@@ -57,7 +57,18 @@ export function useSimpleGame() {
     },
   });
 
-  // Remove sendTransaction hook since we're using direct contract calls
+  // Send transaction hook for better gas control
+  const { sendTransaction, isPending: isSendingTransaction, error: sendError } = useSendTransaction({
+    mutation: {
+      onSuccess: (hash) => {
+        console.log('Transaction sent successfully:', hash);
+        setTransactionHash(hash);
+      },
+      onError: (error) => {
+        console.error('Failed to send transaction:', error);
+      },
+    },
+  });
 
   // Wait for transaction receipt with multiple confirmations
   const { data: receipt, isSuccess: isTransactionSuccess } = useWaitForTransactionReceipt({
@@ -153,18 +164,24 @@ export function useSimpleGame() {
         return false;
       }
       
-      // Use the contract's direct method instead of sendTransaction
-      if (!writeContract) {
-        throw new Error('Contract write function not available');
+      // Use sendTransaction with encoded data for better gas control
+      if (!sendTransaction) {
+        throw new Error('Send transaction function not available');
       }
       
-      await writeContract({
-        address: SIMPLE_GAME_CONTRACT.address,
+      // Encode the function call
+      const data = encodeFunctionData({
         abi: SIMPLE_GAME_CONTRACT.abi,
         functionName: 'startPaidGame',
+      });
+      
+      // Send transaction with explicit gas settings
+      sendTransaction({
+        to: SIMPLE_GAME_CONTRACT.address,
         value: parseEther(SIMPLE_GAME_CONTRACT.gameFee),
-        gas: BigInt(100000), // Conservative gas limit
-        gasPrice: BigInt(1000000000), // 1 gwei gas price to force reasonable fees
+        data: data,
+        gas: BigInt(150000), // Slightly higher gas limit
+        gasPrice: BigInt(2000000000), // 2 gwei gas price
       });
       
       console.log('Transaction sent to MetaMask, waiting for confirmation...');
@@ -254,7 +271,7 @@ export function useSimpleGame() {
     startActualGame,
     
     // Loading states
-    isStartingGame: isStartingGame,
+    isStartingGame: isStartingGame || isSendingTransaction,
     isEndingGame,
     
     // Errors

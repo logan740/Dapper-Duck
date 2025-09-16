@@ -164,24 +164,18 @@ export function useSimpleGame() {
         return false;
       }
       
-      // Use sendTransaction with encoded data for better gas control
-      if (!sendTransaction) {
-        throw new Error('Send transaction function not available');
+      // Use the contract's direct method without any gas settings
+      if (!writeContract) {
+        throw new Error('Contract write function not available');
       }
       
-      // Encode the function call
-      const data = encodeFunctionData({
+      // Call the contract directly without any gas settings
+      await writeContract({
+        address: SIMPLE_GAME_CONTRACT.address,
         abi: SIMPLE_GAME_CONTRACT.abi,
         functionName: 'startPaidGame',
-      });
-      
-      // Send transaction with minimal gas settings
-      sendTransaction({
-        to: SIMPLE_GAME_CONTRACT.address,
         value: parseEther(SIMPLE_GAME_CONTRACT.gameFee),
-        data: data,
-        gas: BigInt(200000), // Higher gas limit to ensure success
-        gasPrice: BigInt(1000000000), // 1 gwei - very low gas price
+        // No gas settings - let MetaMask handle everything
       });
       
       console.log('Transaction sent to MetaMask, waiting for confirmation...');

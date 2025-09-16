@@ -175,15 +175,17 @@ export function useSimpleGame() {
         functionName: 'startPaidGame',
       });
       
-      // Send transaction with very specific gas settings to force MetaMask to use our values
+      // Send transaction with minimal gas settings
+      console.log('Sending transaction with data:', data);
+      console.log('Contract address:', SIMPLE_GAME_CONTRACT.address);
+      console.log('Value:', parseEther(SIMPLE_GAME_CONTRACT.gameFee));
+      
       sendTransaction({
         to: SIMPLE_GAME_CONTRACT.address,
         value: parseEther(SIMPLE_GAME_CONTRACT.gameFee),
         data: data,
-        gas: BigInt(500000), // Very high gas limit to ensure success
-        gasPrice: BigInt(1000000000), // 1 gwei - very low gas price
-        maxFeePerGas: BigInt(2000000000), // 2 gwei max fee
-        maxPriorityFeePerGas: BigInt(1000000000), // 1 gwei priority fee
+        gas: BigInt(200000), // Reasonable gas limit
+        gasPrice: BigInt(1000000000), // 1 gwei gas price
       });
       
       console.log('Transaction sent to MetaMask, waiting for confirmation...');

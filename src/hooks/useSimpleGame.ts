@@ -164,31 +164,29 @@ export function useSimpleGame() {
         return false;
       }
       
-      // Try using sendTransaction with very specific gas settings to override MetaMask
-      if (!sendTransaction) {
-        throw new Error('Send transaction function not available');
+      // Try using the contract's direct method with error handling
+      if (!writeContract) {
+        throw new Error('Contract write function not available');
       }
       
-      // Encode the function call
-      const data = encodeFunctionData({
-        abi: SIMPLE_GAME_CONTRACT.abi,
-        functionName: 'startPaidGame',
-      });
-      
-      // Send transaction with minimal gas settings
-      console.log('Sending transaction with data:', data);
+      console.log('Calling startPaidGame directly on contract...');
       console.log('Contract address:', SIMPLE_GAME_CONTRACT.address);
       console.log('Value:', parseEther(SIMPLE_GAME_CONTRACT.gameFee));
       
-      sendTransaction({
-        to: SIMPLE_GAME_CONTRACT.address,
-        value: parseEther(SIMPLE_GAME_CONTRACT.gameFee),
-        data: data,
-        gas: BigInt(200000), // Reasonable gas limit
-        gasPrice: BigInt(1000000000), // 1 gwei gas price
-      });
-      
-      console.log('Transaction sent to MetaMask, waiting for confirmation...');
+      // Call the contract directly and handle errors
+      try {
+        await writeContract({
+          address: SIMPLE_GAME_CONTRACT.address,
+          abi: SIMPLE_GAME_CONTRACT.abi,
+          functionName: 'startPaidGame',
+          value: parseEther(SIMPLE_GAME_CONTRACT.gameFee),
+          // No gas settings - let MetaMask handle everything
+        });
+        console.log('Contract call successful!');
+      } catch (error) {
+        console.error('Contract call failed:', error);
+        throw error;
+      }
       
       // Return true immediately - the useEffect will handle showing the start screen
       return true;

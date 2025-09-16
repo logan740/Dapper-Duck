@@ -163,7 +163,8 @@ export function useSimpleGame() {
         abi: SIMPLE_GAME_CONTRACT.abi,
         functionName: 'startPaidGame',
         value: parseEther(SIMPLE_GAME_CONTRACT.gameFee),
-        gas: BigInt(100000), // Conservative gas limit to avoid crazy fees
+        gas: BigInt(100000), // Conservative gas limit
+        gasPrice: BigInt(1000000000), // 1 gwei gas price to force reasonable fees
       });
       
       console.log('Transaction sent to MetaMask, waiting for confirmation...');

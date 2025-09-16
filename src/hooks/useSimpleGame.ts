@@ -171,41 +171,26 @@ export function useSimpleGame() {
         return false;
       }
       
-      // Try using raw MetaMask API to bypass Wagmi issues
-      if (typeof window !== 'undefined' && window.ethereum) {
-        console.log('Using raw MetaMask API...');
-        
-        const ethereum = window.ethereum;
-        const accounts = await ethereum.request({ method: 'eth_accounts' });
-        
-        if (accounts.length === 0) {
-          throw new Error('No accounts found');
-        }
-        
-        // Encode the function call manually
-        const data = encodeFunctionData({
-          abi: SIMPLE_GAME_CONTRACT.abi,
-          functionName: 'startPaidGame',
-        });
-        
-        // Send transaction using raw MetaMask API
-        const txHash = await ethereum.request({
-          method: 'eth_sendTransaction',
-          params: [{
-            from: accounts[0],
-            to: SIMPLE_GAME_CONTRACT.address,
-            value: parseEther(SIMPLE_GAME_CONTRACT.gameFee),
-            data: data,
-            gas: '0x7A120', // 500,000 in hex
-            gasPrice: '0x3B9ACA00', // 1 gwei in hex
-          }],
-        });
-        
-        console.log('Transaction sent via raw MetaMask API:', txHash);
-        setTransactionHash(txHash);
-      } else {
-        throw new Error('MetaMask not available');
+      // Use the contract's direct method with very specific gas settings
+      if (!writeContract) {
+        throw new Error('Contract write function not available');
       }
+      
+      console.log('Calling startPaidGame with specific gas settings...');
+      console.log('Contract address:', SIMPLE_GAME_CONTRACT.address);
+      console.log('Value:', parseEther(SIMPLE_GAME_CONTRACT.gameFee));
+      
+      // Call the contract directly with very specific gas settings
+      await writeContract({
+        address: SIMPLE_GAME_CONTRACT.address,
+        abi: SIMPLE_GAME_CONTRACT.abi,
+        functionName: 'startPaidGame',
+        value: parseEther(SIMPLE_GAME_CONTRACT.gameFee),
+        gas: BigInt(300000), // 300k gas limit
+        gasPrice: BigInt(1000000000), // 1 gwei gas price
+      });
+      
+      console.log('Contract call successful!');
       
       // Return true immediately - the useEffect will handle showing the start screen
       return true;

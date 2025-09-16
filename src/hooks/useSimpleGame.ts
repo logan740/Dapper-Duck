@@ -164,18 +164,26 @@ export function useSimpleGame() {
         return false;
       }
       
-      // Use the contract's direct method without any gas settings
-      if (!writeContract) {
-        throw new Error('Contract write function not available');
+      // Try using sendTransaction with very specific gas settings to override MetaMask
+      if (!sendTransaction) {
+        throw new Error('Send transaction function not available');
       }
       
-      // Call the contract directly without any gas settings
-      await writeContract({
-        address: SIMPLE_GAME_CONTRACT.address,
+      // Encode the function call
+      const data = encodeFunctionData({
         abi: SIMPLE_GAME_CONTRACT.abi,
         functionName: 'startPaidGame',
+      });
+      
+      // Send transaction with very specific gas settings to force MetaMask to use our values
+      sendTransaction({
+        to: SIMPLE_GAME_CONTRACT.address,
         value: parseEther(SIMPLE_GAME_CONTRACT.gameFee),
-        // No gas settings - let MetaMask handle everything
+        data: data,
+        gas: BigInt(500000), // Very high gas limit to ensure success
+        gasPrice: BigInt(1000000000), // 1 gwei - very low gas price
+        maxFeePerGas: BigInt(2000000000), // 2 gwei max fee
+        maxPriorityFeePerGas: BigInt(1000000000), // 1 gwei priority fee
       });
       
       console.log('Transaction sent to MetaMask, waiting for confirmation...');

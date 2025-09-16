@@ -3,6 +3,13 @@ import { parseEther, encodeFunctionData } from 'viem';
 import { SIMPLE_GAME_CONTRACT } from '@/config/contract-config';
 import { useState, useEffect } from 'react';
 
+// Extend Window interface for ethereum
+declare global {
+  interface Window {
+    ethereum?: any;
+  }
+}
+
 /**
  * Custom hook for interacting with the SimpleGame contract
  */
@@ -164,28 +171,40 @@ export function useSimpleGame() {
         return false;
       }
       
-      // Try using the contract's direct method with error handling
-      if (!writeContract) {
-        throw new Error('Contract write function not available');
-      }
-      
-      console.log('Calling startPaidGame directly on contract...');
-      console.log('Contract address:', SIMPLE_GAME_CONTRACT.address);
-      console.log('Value:', parseEther(SIMPLE_GAME_CONTRACT.gameFee));
-      
-      // Call the contract directly and handle errors
-      try {
-        await writeContract({
-          address: SIMPLE_GAME_CONTRACT.address,
+      // Try using raw MetaMask API to bypass Wagmi issues
+      if (typeof window !== 'undefined' && window.ethereum) {
+        console.log('Using raw MetaMask API...');
+        
+        const ethereum = window.ethereum;
+        const accounts = await ethereum.request({ method: 'eth_accounts' });
+        
+        if (accounts.length === 0) {
+          throw new Error('No accounts found');
+        }
+        
+        // Encode the function call manually
+        const data = encodeFunctionData({
           abi: SIMPLE_GAME_CONTRACT.abi,
           functionName: 'startPaidGame',
-          value: parseEther(SIMPLE_GAME_CONTRACT.gameFee),
-          // No gas settings - let MetaMask handle everything
         });
-        console.log('Contract call successful!');
-      } catch (error) {
-        console.error('Contract call failed:', error);
-        throw error;
+        
+        // Send transaction using raw MetaMask API
+        const txHash = await ethereum.request({
+          method: 'eth_sendTransaction',
+          params: [{
+            from: accounts[0],
+            to: SIMPLE_GAME_CONTRACT.address,
+            value: parseEther(SIMPLE_GAME_CONTRACT.gameFee),
+            data: data,
+            gas: '0x7A120', // 500,000 in hex
+            gasPrice: '0x3B9ACA00', // 1 gwei in hex
+          }],
+        });
+        
+        console.log('Transaction sent via raw MetaMask API:', txHash);
+        setTransactionHash(txHash);
+      } else {
+        throw new Error('MetaMask not available');
       }
       
       // Return true immediately - the useEffect will handle showing the start screen

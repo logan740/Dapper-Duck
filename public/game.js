@@ -137,6 +137,48 @@
   let dpr = Math.max(1, window.devicePixelRatio || 1);
   let scale = 1, offsetX = 0, offsetY = 0;
 
+  // ---------------- Biomes ----------------
+  const Biome = { CLASSIC: 'classic', LAVA_CAVERN: 'lava-cavern' };
+  let currentBiome = Biome.LAVA_CAVERN; // default
+
+  // Lava-cavern background state
+  let caveCeilingPoints = [];
+  let caveFloorPoints = [];
+  let stalactites = [];
+  let stalagmites = [];
+  let lavaWaveT = 0;
+  let emberParticles = [];
+  const MAX_EMBERS = 70;
+
+  function readInitialBiome() {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const fromUrl = params.get('biome');
+      const stored = localStorage.getItem('dapperDuck_biome');
+      const isValid = (b) => b === Biome.CLASSIC || b === Biome.LAVA_CAVERN;
+      if (fromUrl && isValid(fromUrl)) return fromUrl;
+      if (stored && isValid(stored)) return stored;
+    } catch {}
+    return Biome.LAVA_CAVERN;
+  }
+
+  function applyBiome(biome) {
+    currentBiome = biome;
+    if (currentBiome === Biome.CLASSIC) {
+      initClouds();
+    } else {
+      initCaveFeatures();
+      initEmbers(true);
+    }
+    try { localStorage.setItem('dapperDuck_biome', currentBiome); } catch {}
+    console.log('Biome set to:', currentBiome);
+  }
+
+  window.setBiome = function(b) {
+    if (b === Biome.CLASSIC || b === Biome.LAVA_CAVERN) applyBiome(b);
+  };
+  window.getBiome = function() { return currentBiome; };
+
   function calculateResponsiveDeadZones() {
     const cssW = window.innerWidth;
     const cssH = window.innerHeight;
@@ -254,6 +296,9 @@
   }
   window.addEventListener('resize', resize, { passive: true });
   resize();
+
+  // Initialize biome after we have canvas sizing
+  applyBiome(readInitialBiome());
 
   // ---------------- Enhanced State & UI ----------------
   const State = { MENU: 0, PLAY: 1, OVER: 2 };
@@ -510,6 +555,86 @@
     }
   }
   initClouds();
+
+  // -------- Lava Cavern helpers --------
+  function initCaveFeatures() {
+    // Jagged ceiling and floor silhouettes (stable per session)
+    const segs = 14;
+    caveCeilingPoints = [];
+    caveFloorPoints = [];
+    for (let i = 0; i <= segs; i++) {
+      const x = (VIRTUAL_WIDTH / segs) * i;
+      const yTop = 12 + Math.random() * 38; // 12..50
+      const yBot = VIRTUAL_HEIGHT - (28 + Math.random() * 36); // height-64..height-28
+      caveCeilingPoints.push({ x, y: yTop });
+      caveFloorPoints.push({ x, y: yBot });
+    }
+
+    // Stalactites and stalagmites
+    const numStalactites = 10;
+    const numStalagmites = 10;
+    stalactites = [];
+    stalagmites = [];
+    for (let i = 0; i < numStalactites; i++) {
+      stalactites.push({
+        x: Math.random() * VIRTUAL_WIDTH,
+        w: 10 + Math.random() * 24,
+        h: 30 + Math.random() * 65
+      });
+    }
+    for (let i = 0; i < numStalagmites; i++) {
+      stalagmites.push({
+        x: Math.random() * VIRTUAL_WIDTH,
+        w: 12 + Math.random() * 26,
+        h: 26 + Math.random() * 60
+      });
+    }
+  }
+
+  function initEmbers(reset = false) {
+    if (reset) emberParticles = [];
+    // Seed some particles so it starts alive
+    for (let i = emberParticles.length; i < MAX_EMBERS * 0.6; i++) {
+      emberParticles.push(makeEmber());
+    }
+  }
+
+  function makeEmber() {
+    const spawnY = VIRTUAL_HEIGHT - 24 + Math.random() * 12;
+    return {
+      x: Math.random() * VIRTUAL_WIDTH,
+      y: spawnY,
+      vx: (Math.random() - 0.5) * 22,
+      vy: 30 + Math.random() * 40,
+      life: 0,
+      maxLife: 1.2 + Math.random() * 1.4,
+      size: 1 + Math.random() * 2
+    };
+  }
+
+  function updateEmbers(dt) {
+    // Maintain target count
+    if (emberParticles.length < MAX_EMBERS) {
+      const toAdd = Math.min(4, MAX_EMBERS - emberParticles.length);
+      for (let i = 0; i < toAdd; i++) emberParticles.push(makeEmber());
+    }
+
+    for (let i = emberParticles.length - 1; i >= 0; i--) {
+      const p = emberParticles[i];
+      p.life += dt;
+      p.x += p.vx * dt;
+      p.y -= p.vy * dt;
+      // Gentle drift upwards
+      p.vx += (Math.random() - 0.5) * 4 * dt;
+      if (p.life >= p.maxLife || p.y < 0) {
+        emberParticles.splice(i, 1);
+      }
+    }
+  }
+
+  function updateLava(dt) {
+    lavaWaveT += dt * 1.5;
+  }
 
   let worldX = 0;
   let last = performance.now();
@@ -1099,14 +1224,16 @@
 
   // ---------------- Enhanced Physics System ----------------
   function physicsStep(dt) {
-    // Enhanced cloud movement
-    for (const layer of clouds) {
-      for (const b of layer.blobs) {
-        b.x += b.vx * dt;
-        if (b.x < -150) {
-          b.x = VIRTUAL_WIDTH + 100;
-          b.y = Math.random() * VIRTUAL_HEIGHT;
-          b.r = 20 + Math.random() * 60 * layer.z;
+    // Enhanced cloud movement (classic biome only)
+    if (currentBiome === Biome.CLASSIC) {
+      for (const layer of clouds) {
+        for (const b of layer.blobs) {
+          b.x += b.vx * dt;
+          if (b.x < -150) {
+            b.x = VIRTUAL_WIDTH + 100;
+            b.y = Math.random() * VIRTUAL_HEIGHT;
+            b.r = 20 + Math.random() * 60 * layer.z;
+          }
         }
       }
     }
@@ -1138,6 +1265,14 @@
 
   // ---------------- Enhanced Drawing System ----------------
   function drawBackground() {
+    if (currentBiome === Biome.LAVA_CAVERN) {
+      drawBackgroundLavaCavern();
+    } else {
+      drawBackgroundClassic();
+    }
+  }
+
+  function drawBackgroundClassic() {
     const g = ctx.createLinearGradient(0, 0, 0, VIRTUAL_HEIGHT);
     g.addColorStop(0, '#fff9e6');
     g.addColorStop(1, '#ffe39f');
@@ -1166,6 +1301,116 @@
       }
       ctx.restore();
     }
+  }
+
+  function drawBackgroundLavaCavern() {
+    // Deep cave gradient
+    const g = ctx.createLinearGradient(0, 0, 0, VIRTUAL_HEIGHT);
+    g.addColorStop(0, '#12090b');
+    g.addColorStop(0.6, '#1b0e12');
+    g.addColorStop(1, '#2a1010');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
+
+    // Cave ceiling silhouette
+    ctx.save();
+    ctx.fillStyle = '#1a0e12';
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(0, caveCeilingPoints.length ? caveCeilingPoints[0].y : 30);
+    for (let i = 0; i < caveCeilingPoints.length; i++) {
+      const p = caveCeilingPoints[i];
+      ctx.lineTo(p.x, p.y);
+    }
+    ctx.lineTo(VIRTUAL_WIDTH, 0);
+    ctx.closePath();
+    ctx.fill();
+
+    // Stalactites
+    ctx.fillStyle = '#140a0d';
+    for (const s of stalactites) {
+      const y0 = 8 + 28; // anchor offset
+      ctx.beginPath();
+      ctx.moveTo(s.x - s.w * 0.5, y0);
+      ctx.lineTo(s.x + s.w * 0.5, y0);
+      ctx.lineTo(s.x, y0 + s.h);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    // Lava surface (animated wavy top)
+    const lavaTopBase = VIRTUAL_HEIGHT - 40;
+    const waveAmp = 6;
+    const waveFreq = 0.02;
+    const wavePhase = lavaWaveT * 2.2;
+    const lavaTopY = (x) => lavaTopBase + Math.sin(x * waveFreq + wavePhase) * waveAmp;
+
+    // Lava body
+    ctx.beginPath();
+    ctx.moveTo(0, VIRTUAL_HEIGHT);
+    ctx.lineTo(0, lavaTopY(0));
+    for (let x = 0; x <= VIRTUAL_WIDTH; x += 6) {
+      ctx.lineTo(x, lavaTopY(x));
+    }
+    ctx.lineTo(VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
+    ctx.closePath();
+    const lg = ctx.createLinearGradient(0, lavaTopBase - 10, 0, VIRTUAL_HEIGHT);
+    lg.addColorStop(0, '#ff7a1a');
+    lg.addColorStop(0.4, '#ff5300');
+    lg.addColorStop(1, '#b32100');
+    ctx.fillStyle = lg;
+    ctx.fill();
+
+    // Glow above lava
+    ctx.save();
+    const glow = ctx.createLinearGradient(0, lavaTopBase - 50, 0, lavaTopBase + 10);
+    glow.addColorStop(0, 'rgba(255, 120, 32, 0)');
+    glow.addColorStop(1, 'rgba(255, 120, 32, 0.25)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, lavaTopBase - 50, VIRTUAL_WIDTH, 60);
+    ctx.restore();
+
+    // Floor silhouette above lava
+    ctx.fillStyle = '#1a0e12';
+    ctx.beginPath();
+    ctx.moveTo(0, VIRTUAL_HEIGHT);
+    for (let i = 0; i < caveFloorPoints.length; i++) {
+      const p = caveFloorPoints[i];
+      ctx.lineTo(p.x, Math.max(p.y, lavaTopY(p.x) + 6));
+    }
+    ctx.lineTo(VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
+    ctx.closePath();
+    ctx.fill();
+
+    // Stalagmites (silhouette lit by lava)
+    for (const s of stalagmites) {
+      const baseY = lavaTopBase + 6;
+      ctx.beginPath();
+      ctx.moveTo(s.x - s.w * 0.5, baseY);
+      ctx.lineTo(s.x + s.w * 0.5, baseY);
+      ctx.lineTo(s.x, baseY - s.h);
+      ctx.closePath();
+      ctx.fillStyle = '#221015';
+      ctx.fill();
+    }
+  }
+
+  function drawEmbers() {
+    if (!emberParticles.length) return;
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    for (const p of emberParticles) {
+      const t = Math.min(1, p.life / p.maxLife);
+      const alpha = 0.9 * (1 - t);
+      const r = 230 + Math.round(25 * (1 - t));
+      const g = 120 + Math.round(80 * (1 - t));
+      const b = 10 + Math.round(20 * (1 - t));
+      ctx.fillStyle = `rgba(${r},${g},${b},${alpha})`;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
   }
 
   function drawDeathZoneIndicators() {
@@ -1293,6 +1538,12 @@
     last = now;
     dtGlobal = dt;
 
+    // Biome background updates independent of game state
+    if (currentBiome === Biome.LAVA_CAVERN) {
+      updateLava(dt);
+      updateEmbers(dt);
+    }
+
     if (state === State.PLAY) {
       timeAlive += dt;
       difficultyLevel = getDifficultyLevel();
@@ -1312,6 +1563,7 @@
 
     // Enhanced rendering
     drawBackground();
+    if (currentBiome === Biome.LAVA_CAVERN) drawEmbers();
     drawDeathZoneIndicators();
     drawDuck();
     drawFud();
